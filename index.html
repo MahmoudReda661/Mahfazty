@@ -6,122 +6,112 @@
 <meta name="theme-color" content="#0f1923">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>محفظتي</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0a0f1a;
-    --card: #111827;
-    --card2: #1a2436;
-    --accent: #f59e0b;
-    --accent2: #10b981;
-    --accent3: #ef4444;
-    --accent4: #3b82f6;
-    --text: #f1f5f9;
-    --muted: #64748b;
-    --border: #1e2d42;
-    --radius: 18px;
+    --bg: #0a0f1a; --card: #111827; --card2: #1a2436;
+    --accent: #f59e0b; --accent2: #10b981; --accent3: #ef4444; --accent4: #3b82f6;
+    --text: #f1f5f9; --muted: #64748b; --border: #1e2d42; --radius: 18px;
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { font-family: 'Cairo', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
 
-  body {
-    font-family: 'Cairo', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: hidden;
+  /* ── LOGIN PAGE ── */
+  #login-page {
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; padding: 24px;
   }
+  .login-logo { font-size: 3.5rem; margin-bottom: 8px; }
+  .login-title { font-size: 2rem; font-weight: 900; color: var(--accent); margin-bottom: 4px; }
+  .login-sub { font-size: .85rem; color: var(--muted); margin-bottom: 40px; }
+  .login-card {
+    background: var(--card); border-radius: 24px; border: 1px solid var(--border);
+    padding: 28px 24px; width: 100%; max-width: 400px;
+  }
+  .login-tabs { display: flex; gap: 0; margin-bottom: 24px; background: var(--card2); border-radius: 12px; padding: 4px; }
+  .login-tab {
+    flex: 1; padding: 9px; border: none; background: none;
+    font-family: 'Cairo', sans-serif; font-size: .85rem; font-weight: 700;
+    color: var(--muted); border-radius: 10px; cursor: pointer; transition: all .2s;
+  }
+  .login-tab.active { background: var(--accent); color: #000; }
+  .login-field { margin-bottom: 14px; }
+  .login-field label { display: block; font-size: .78rem; color: var(--muted); font-weight: 600; margin-bottom: 6px; }
+  .login-field input {
+    width: 100%; background: var(--card2); border: 1.5px solid var(--border);
+    border-radius: 12px; color: var(--text); font-family: 'Cairo', sans-serif;
+    font-size: .9rem; padding: 12px 14px; outline: none; transition: border-color .2s;
+  }
+  .login-field input:focus { border-color: var(--accent); }
+  .btn-login {
+    width: 100%; padding: 14px; background: linear-gradient(135deg, var(--accent), #d97706);
+    border: none; border-radius: 12px; color: #000;
+    font-family: 'Cairo', sans-serif; font-size: 1rem; font-weight: 900;
+    cursor: pointer; margin-top: 6px; transition: opacity .15s;
+  }
+  .btn-login:active { opacity: .85; }
+  .login-err { color: var(--accent3); font-size: .8rem; text-align: center; margin-top: 10px; min-height: 20px; }
 
-  /* ── TOP BAR ── */
+  /* ── APP ── */
+  #app-page { display: none; }
   .topbar {
     position: sticky; top: 0; z-index: 100;
-    background: rgba(10,15,26,.85);
-    backdrop-filter: blur(16px);
-    padding: 14px 20px;
-    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(10,15,26,.92); backdrop-filter: blur(16px);
+    padding: 14px 20px; display: flex; align-items: center; justify-content: space-between;
     border-bottom: 1px solid var(--border);
   }
-  .topbar h1 { font-size: 1.2rem; font-weight: 900; color: var(--accent); letter-spacing: -.5px; }
-  .topbar span { font-size: .75rem; color: var(--muted); }
-
-  /* ── MAIN ── */
+  .topbar h1 { font-size: 1.2rem; font-weight: 900; color: var(--accent); }
+  .btn-logout {
+    background: rgba(239,68,68,.15); color: var(--accent3); border: none;
+    border-radius: 10px; font-family: 'Cairo', sans-serif; font-size: .75rem;
+    font-weight: 700; padding: 6px 12px; cursor: pointer;
+  }
   main { padding: 16px; max-width: 480px; margin: auto; }
 
-  /* ── DASHBOARD CARDS ── */
-  .dash-grid {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 12px; margin-bottom: 20px;
-  }
+  .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
   .dash-card {
-    background: var(--card); border-radius: var(--radius);
-    padding: 16px 14px;
-    border: 1px solid var(--border);
-    position: relative; overflow: hidden;
-    transition: transform .15s;
+    background: var(--card); border-radius: var(--radius); padding: 16px 14px;
+    border: 1px solid var(--border); position: relative; overflow: hidden; transition: transform .15s;
   }
   .dash-card:active { transform: scale(.97); }
   .dash-card.full { grid-column: 1/-1; }
-  .dash-card .label { font-size: .7rem; color: var(--muted); margin-bottom: 6px; font-weight: 600; letter-spacing: .5px; }
+  .dash-card .label { font-size: .7rem; color: var(--muted); margin-bottom: 6px; font-weight: 600; }
   .dash-card .amount { font-size: 1.5rem; font-weight: 900; }
   .dash-card .sub { font-size: .7rem; color: var(--muted); margin-top: 3px; }
-  .dash-card .icon {
-    position: absolute; left: 12px; top: 12px;
-    font-size: 1.6rem; opacity: .15;
-  }
+  .dash-card .icon { position: absolute; left: 12px; top: 12px; font-size: 1.6rem; opacity: .15; }
   .c-yellow .amount { color: var(--accent); }
   .c-green .amount { color: var(--accent2); }
   .c-red .amount { color: var(--accent3); }
   .c-blue .amount { color: var(--accent4); }
 
-  /* progress bar */
   .progress-wrap { margin-top: 10px; }
   .progress-label { display: flex; justify-content: space-between; font-size: .68rem; color: var(--muted); margin-bottom: 5px; }
   .progress-bar { height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; }
   .progress-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--accent2), var(--accent)); transition: width .5s ease; }
 
-  /* ── SECTION TITLE ── */
-  .section-title {
-    font-size: .8rem; font-weight: 700; color: var(--muted);
-    letter-spacing: 1px; text-transform: uppercase;
-    margin: 20px 0 10px;
-  }
+  .section-title { font-size: .8rem; font-weight: 700; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin: 20px 0 10px; }
 
-  /* ── ADD BUTTON ── */
   .btn-add {
-    width: 100%; padding: 15px;
-    background: linear-gradient(135deg, var(--accent), #d97706);
-    border: none; border-radius: var(--radius);
-    color: #000; font-family: 'Cairo', sans-serif;
-    font-size: 1rem; font-weight: 900;
-    cursor: pointer; letter-spacing: .3px;
-    transition: opacity .15s, transform .1s;
+    width: 100%; padding: 15px; background: linear-gradient(135deg, var(--accent), #d97706);
+    border: none; border-radius: var(--radius); color: #000;
+    font-family: 'Cairo', sans-serif; font-size: 1rem; font-weight: 900;
+    cursor: pointer; transition: opacity .15s, transform .1s;
     display: flex; align-items: center; justify-content: center; gap: 8px;
   }
   .btn-add:active { opacity: .85; transform: scale(.98); }
 
-  /* ── INVOICE LIST ── */
   .invoice-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 100px; }
-
   .invoice-card {
-    background: var(--card); border-radius: var(--radius);
-    border: 1px solid var(--border);
-    overflow: hidden;
-    animation: slideIn .3s ease;
+    background: var(--card); border-radius: var(--radius); border: 1px solid var(--border);
+    overflow: hidden; animation: slideIn .3s ease;
   }
   @keyframes slideIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
 
-  .inv-header {
-    display: flex; align-items: center; gap: 12px;
-    padding: 14px 16px;
-    cursor: pointer;
-  }
+  .inv-header { display: flex; align-items: center; gap: 12px; padding: 14px 16px; }
   .inv-thumb {
-    width: 46px; height: 46px; border-radius: 12px;
-    object-fit: cover; flex-shrink: 0;
-    background: var(--card2);
-    display: flex; align-items: center; justify-content: center;
+    width: 46px; height: 46px; border-radius: 12px; flex-shrink: 0;
+    background: var(--card2); display: flex; align-items: center; justify-content: center;
     font-size: 1.5rem; overflow: hidden;
   }
   .inv-thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
@@ -130,29 +120,21 @@
   .inv-date { font-size: .7rem; color: var(--muted); margin-top: 2px; }
   .inv-amount { font-size: 1.1rem; font-weight: 900; color: var(--accent); white-space: nowrap; }
 
-  .status-pills {
-    display: flex; gap: 6px; padding: 0 16px 12px;
-    flex-wrap: wrap;
-  }
+  .status-pills { display: flex; gap: 6px; padding: 0 16px 12px; flex-wrap: wrap; }
   .pill {
-    font-size: .68rem; font-weight: 700; padding: 3px 10px;
-    border-radius: 99px; border: 1.5px solid;
-    cursor: pointer; transition: all .15s;
-    user-select: none;
+    font-size: .68rem; font-weight: 700; padding: 3px 10px; border-radius: 99px;
+    border: 1.5px solid; cursor: pointer; transition: all .15s; user-select: none;
   }
-  .pill.received   { border-color: var(--accent2); color: var(--accent2); }
+  .pill.received { border-color: var(--accent2); color: var(--accent2); }
   .pill.received.on { background: var(--accent2); color: #000; }
-  .pill.spent      { border-color: var(--accent3); color: var(--accent3); }
-  .pill.spent.on   { background: var(--accent3); color: #fff; }
-  .pill.delivered  { border-color: var(--accent4); color: var(--accent4); }
+  .pill.spent { border-color: var(--accent3); color: var(--accent3); }
+  .pill.spent.on { background: var(--accent3); color: #fff; }
+  .pill.delivered { border-color: var(--accent4); color: var(--accent4); }
   .pill.delivered.on { background: var(--accent4); color: #fff; }
 
-  .inv-actions {
-    display: flex; gap: 8px; padding: 0 16px 14px;
-  }
+  .inv-actions { display: flex; gap: 8px; padding: 0 16px 14px; }
   .btn-sm {
-    flex: 1; padding: 8px 4px;
-    border-radius: 10px; border: none;
+    flex: 1; padding: 8px 4px; border-radius: 10px; border: none;
     font-family: 'Cairo', sans-serif; font-size: .75rem; font-weight: 700;
     cursor: pointer; transition: opacity .15s;
   }
@@ -160,26 +142,19 @@
   .btn-edit { background: var(--card2); color: var(--text); }
   .btn-del { background: rgba(239,68,68,.15); color: var(--accent3); }
 
-  /* ── SPENT INPUT row ── */
-  .spent-row {
-    padding: 0 16px 14px;
-    display: flex; gap: 8px;
-  }
+  .spent-row { padding: 0 16px 14px; display: flex; gap: 8px; }
   .spent-row input {
     flex: 1; background: var(--card2); border: 1px solid var(--border);
-    border-radius: 10px; color: var(--text);
-    font-family: 'Cairo', sans-serif; font-size: .85rem;
-    padding: 9px 12px; outline: none;
+    border-radius: 10px; color: var(--text); font-family: 'Cairo', sans-serif;
+    font-size: .85rem; padding: 9px 12px; outline: none;
   }
   .spent-row input:focus { border-color: var(--accent3); }
   .spent-row button {
-    background: var(--accent3); color: #fff;
-    border: none; border-radius: 10px;
+    background: var(--accent3); color: #fff; border: none; border-radius: 10px;
     font-family: 'Cairo', sans-serif; font-size: .8rem; font-weight: 700;
     padding: 9px 16px; cursor: pointer;
   }
 
-  /* ── MODAL ── */
   .overlay {
     display: none; position: fixed; inset: 0; z-index: 200;
     background: rgba(0,0,0,.7); backdrop-filter: blur(4px);
@@ -188,38 +163,28 @@
   .overlay.show { display: flex; }
   .modal {
     background: var(--card); border-radius: 24px 24px 0 0;
-    width: 100%; max-width: 480px;
-    padding: 24px 20px 40px;
-    border-top: 1px solid var(--border);
-    animation: slideUp .3s ease;
-    max-height: 92vh; overflow-y: auto;
+    width: 100%; max-width: 480px; padding: 24px 20px 40px;
+    border-top: 1px solid var(--border); animation: slideUp .3s ease;
+    max-height: 92vh; overflow-y: auto; position: relative;
   }
   @keyframes slideUp { from { transform:translateY(100%); } to { transform:translateY(0); } }
-
   .modal-title { font-size: 1.1rem; font-weight: 900; margin-bottom: 20px; text-align: center; }
   .modal-close {
-    position: absolute; left: 20px; top: 20px;
-    background: var(--card2); border: none; color: var(--muted);
-    border-radius: 50%; width: 32px; height: 32px;
+    position: absolute; left: 20px; top: 20px; background: var(--card2);
+    border: none; color: var(--muted); border-radius: 50%; width: 32px; height: 32px;
     font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
   }
-  .modal { position: relative; }
-
   .field { margin-bottom: 14px; }
   .field label { display: block; font-size: .78rem; color: var(--muted); font-weight: 600; margin-bottom: 6px; }
-  .field input, .field textarea, .field select {
+  .field input, .field textarea {
     width: 100%; background: var(--card2); border: 1.5px solid var(--border);
-    border-radius: 12px; color: var(--text);
-    font-family: 'Cairo', sans-serif; font-size: .9rem;
-    padding: 12px 14px; outline: none;
-    transition: border-color .2s;
+    border-radius: 12px; color: var(--text); font-family: 'Cairo', sans-serif;
+    font-size: .9rem; padding: 12px 14px; outline: none; transition: border-color .2s;
   }
   .field input:focus, .field textarea:focus { border-color: var(--accent); }
   .field textarea { resize: none; height: 70px; }
-
   .photo-upload {
-    width: 100%; height: 90px;
-    border: 2px dashed var(--border); border-radius: 12px;
+    width: 100%; height: 90px; border: 2px dashed var(--border); border-radius: 12px;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     cursor: pointer; gap: 4px; transition: border-color .2s; position: relative;
   }
@@ -227,96 +192,60 @@
   .photo-upload span { font-size: .8rem; color: var(--muted); }
   .photo-upload input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
   .photo-preview { width: 100%; border-radius: 12px; object-fit: cover; max-height: 160px; display: none; margin-top: 8px; }
-
   .btn-save {
-    width: 100%; padding: 15px;
-    background: linear-gradient(135deg, var(--accent), #d97706);
-    border: none; border-radius: var(--radius);
-    color: #000; font-family: 'Cairo', sans-serif;
-    font-size: 1rem; font-weight: 900; cursor: pointer;
-    margin-top: 8px;
-    transition: opacity .15s;
+    width: 100%; padding: 15px; background: linear-gradient(135deg, var(--accent), #d97706);
+    border: none; border-radius: var(--radius); color: #000;
+    font-family: 'Cairo', sans-serif; font-size: 1rem; font-weight: 900;
+    cursor: pointer; margin-top: 8px; transition: opacity .15s;
   }
   .btn-save:active { opacity: .85; }
 
-  /* ── EMPTY STATE ── */
-  .empty {
-    text-align: center; padding: 50px 20px;
-    color: var(--muted); font-size: .9rem;
-  }
+  .empty { text-align: center; padding: 50px 20px; color: var(--muted); font-size: .9rem; }
   .empty .big { font-size: 3rem; margin-bottom: 10px; }
 
-  /* ── BOTTOM NAV ── */
   .bottom-nav {
     position: fixed; bottom: 0; left: 0; right: 0;
     background: rgba(10,15,26,.95); backdrop-filter: blur(16px);
     border-top: 1px solid var(--border);
-    display: flex; justify-content: space-around; padding: 10px 0 20px;
-    z-index: 50;
+    display: flex; justify-content: space-around; padding: 10px 0 20px; z-index: 50;
   }
   .nav-btn {
     background: none; border: none; color: var(--muted);
     font-family: 'Cairo', sans-serif; font-size: .65rem;
     display: flex; flex-direction: column; align-items: center; gap: 3px;
-    cursor: pointer; transition: color .15s; padding: 4px 16px;
+    cursor: pointer; transition: color .15s; padding: 4px 12px;
   }
   .nav-btn .ico { font-size: 1.4rem; }
   .nav-btn.active { color: var(--accent); }
 
-  /* TABS */
   .tab-content { display: none; }
   .tab-content.active { display: block; }
 
-  /* ── HISTORY TAB ── */
   .filter-row { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
   .filter-btn {
-    padding: 6px 14px; border-radius: 99px;
-    border: 1.5px solid var(--border); background: none;
-    color: var(--muted); font-family: 'Cairo', sans-serif; font-size: .75rem; font-weight: 700;
-    cursor: pointer; transition: all .15s;
+    padding: 6px 14px; border-radius: 99px; border: 1.5px solid var(--border);
+    background: none; color: var(--muted); font-family: 'Cairo', sans-serif;
+    font-size: .75rem; font-weight: 700; cursor: pointer; transition: all .15s;
   }
   .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #000; }
 
-  /* ── MONTH CHART ── */
   .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 80px; margin: 10px 0 4px; }
   .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
   .bar { width: 100%; border-radius: 6px 6px 0 0; min-height: 4px; transition: height .4s ease; }
   .bar-label { font-size: .6rem; color: var(--muted); }
 
-  /* ── BACKUP BUTTONS ── */
-  .backup-row { display: flex; gap: 8px; margin-bottom: 16px; }
-  .btn-backup {
-    flex: 1; padding: 11px 8px;
-    border-radius: 12px; border: 1.5px solid var(--border);
-    background: var(--card); color: var(--text);
-    font-family: 'Cairo', sans-serif; font-size: .8rem; font-weight: 700;
-    cursor: pointer; transition: all .15s;
-    display: flex; align-items: center; justify-content: center; gap: 6px;
-  }
-  .btn-backup:active { opacity: .75; transform: scale(.97); }
-  .btn-backup.export { border-color: var(--accent2); color: var(--accent2); }
-  .btn-backup.import { border-color: var(--accent4); color: var(--accent4); }
-
-  /* ── PEOPLE TAB ── */
+  /* People tab */
   .search-box {
     width: 100%; background: var(--card); border: 1.5px solid var(--border);
-    border-radius: 12px; color: var(--text);
-    font-family: 'Cairo', sans-serif; font-size: .9rem;
-    padding: 12px 14px; outline: none; margin-bottom: 14px;
-    transition: border-color .2s;
+    border-radius: 12px; color: var(--text); font-family: 'Cairo', sans-serif;
+    font-size: .9rem; padding: 12px 14px; outline: none; margin-bottom: 14px; transition: border-color .2s;
   }
   .search-box:focus { border-color: var(--accent); }
-
   .person-card {
-    background: var(--card); border-radius: var(--radius);
-    border: 1px solid var(--border); margin-bottom: 12px;
-    overflow: hidden; animation: slideIn .3s ease;
-    cursor: pointer;
+    background: var(--card); border-radius: var(--radius); border: 1px solid var(--border);
+    margin-bottom: 12px; overflow: hidden; animation: slideIn .3s ease;
   }
-  .person-header {
-    display: flex; align-items: center; gap: 12px;
-    padding: 14px 16px;
-  }
+  .person-header { display: flex; align-items: center; gap: 12px; padding: 14px 16px; cursor: pointer; }
   .person-avatar {
     width: 44px; height: 44px; border-radius: 50%;
     background: linear-gradient(135deg, var(--accent), #d97706);
@@ -327,13 +256,8 @@
   .person-name { font-weight: 700; font-size: .95rem; }
   .person-sub { font-size: .7rem; color: var(--muted); margin-top: 2px; }
   .person-total { font-size: 1.1rem; font-weight: 900; color: var(--accent); }
-
   .person-months { padding: 0 16px 14px; }
-  .month-row {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 8px 0; border-top: 1px solid var(--border);
-    font-size: .8rem;
-  }
+  .month-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-top: 1px solid var(--border); font-size: .8rem; }
   .month-row .m-label { color: var(--muted); }
   .month-row .m-stats { display: flex; gap: 12px; align-items: center; }
   .month-row .m-count { color: var(--muted); font-size: .72rem; }
@@ -347,197 +271,168 @@
   .person-detail-overlay.show { display: flex; }
   .person-detail-modal {
     background: var(--card); border-radius: 24px 24px 0 0;
-    width: 100%; max-width: 480px;
-    padding: 24px 20px 40px;
-    border-top: 1px solid var(--border);
-    animation: slideUp .3s ease;
-    max-height: 92vh; overflow-y: auto;
-    position: relative;
+    width: 100%; max-width: 480px; padding: 24px 20px 40px;
+    border-top: 1px solid var(--border); animation: slideUp .3s ease;
+    max-height: 92vh; overflow-y: auto; position: relative;
   }
 
-  /* Notification toast */
   .toast {
     position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px);
-    background: var(--card2); border: 1px solid var(--border);
-    border-radius: 12px; padding: 10px 20px;
-    font-size: .85rem; font-weight: 600;
-    opacity: 0; transition: all .3s; z-index: 999;
-    white-space: nowrap;
+    background: var(--card2); border: 1px solid var(--border); border-radius: 12px;
+    padding: 10px 20px; font-size: .85rem; font-weight: 600;
+    opacity: 0; transition: all .3s; z-index: 999; white-space: nowrap;
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* Loading */
+  .loading {
+    position: fixed; inset: 0; background: var(--bg);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 9999; gap: 16px;
+  }
+  .spinner {
+    width: 40px; height: 40px; border: 3px solid var(--border);
+    border-top-color: var(--accent); border-radius: 50%;
+    animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading p { color: var(--muted); font-size: .9rem; }
 </style>
 </head>
 <body>
 
-<div class="topbar">
-  <h1>💼 محفظتي</h1>
-  <span id="today-date"></span>
+<!-- LOADING -->
+<div class="loading" id="loading">
+  <div style="font-size:2.5rem">💼</div>
+  <div class="spinner"></div>
+  <p>جاري التحميل...</p>
 </div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- MAIN CONTENT -->
-<main>
+<!-- ── LOGIN PAGE ── -->
+<div id="login-page" style="display:none">
+  <div class="login-logo">💼</div>
+  <div class="login-title">محفظتي</div>
+  <div class="login-sub">نظام إدارة الفواتير والمدفوعات</div>
+  <div class="login-card">
+    <div class="login-tabs">
+      <button class="login-tab active" onclick="switchLoginTab('login',this)">تسجيل الدخول</button>
+      <button class="login-tab" onclick="switchLoginTab('register',this)">حساب جديد</button>
+    </div>
+    <div id="login-form">
+      <div class="login-field"><label>الإيميل</label><input type="email" id="l-email" placeholder="example@email.com" inputmode="email"></div>
+      <div class="login-field"><label>كلمة المرور</label><input type="password" id="l-pass" placeholder="••••••••"></div>
+      <button class="btn-login" onclick="doLogin()">🔐 دخول</button>
+    </div>
+    <div id="register-form" style="display:none">
+      <div class="login-field"><label>الاسم</label><input type="text" id="r-name" placeholder="اسمك"></div>
+      <div class="login-field"><label>الإيميل</label><input type="email" id="r-email" placeholder="example@email.com" inputmode="email"></div>
+      <div class="login-field"><label>كلمة المرور</label><input type="password" id="r-pass" placeholder="6 حروف على الأقل"></div>
+      <button class="btn-login" onclick="doRegister()">✨ إنشاء حساب</button>
+    </div>
+    <div class="login-err" id="login-err"></div>
+  </div>
+</div>
 
-  <!-- TAB: DASHBOARD -->
-  <div class="tab-content active" id="tab-home">
+<!-- ── APP PAGE ── -->
+<div id="app-page">
+  <div class="topbar">
+    <h1>💼 محفظتي</h1>
+    <button class="btn-logout" onclick="doLogout()">خروج 👋</button>
+  </div>
 
-    <div class="dash-grid">
-      <div class="dash-card c-yellow">
-        <div class="icon">💰</div>
-        <div class="label">إجمالي المستلم</div>
-        <div class="amount" id="d-total">0</div>
-        <div class="sub">جنيه</div>
-      </div>
-      <div class="dash-card c-green">
-        <div class="icon">✅</div>
-        <div class="label">تم تسليمه</div>
-        <div class="amount" id="d-delivered">0</div>
-        <div class="sub">جنيه</div>
-      </div>
-      <div class="dash-card c-red">
-        <div class="icon">🛒</div>
-        <div class="label">تم صرفه</div>
-        <div class="amount" id="d-spent">0</div>
-        <div class="sub">جنيه</div>
-      </div>
-      <div class="dash-card c-blue">
-        <div class="icon">🏦</div>
-        <div class="label">المتبقي معك</div>
-        <div class="amount" id="d-remaining">0</div>
-        <div class="sub">جنيه</div>
-      </div>
-      <div class="dash-card full c-green">
-        <div class="label">نسبة الإنجاز (تسليم من إجمالي)</div>
-        <div class="progress-wrap">
-          <div class="progress-label">
-            <span id="prog-label-l">0 جنيه سُلّم</span>
-            <span id="prog-label-r">0%</span>
+  <main>
+    <!-- HOME TAB -->
+    <div class="tab-content active" id="tab-home">
+      <div class="dash-grid">
+        <div class="dash-card c-yellow"><div class="icon">💰</div><div class="label">إجمالي المستلم</div><div class="amount" id="d-total">0</div><div class="sub">جنيه</div></div>
+        <div class="dash-card c-green"><div class="icon">✅</div><div class="label">تم تسليمه</div><div class="amount" id="d-delivered">0</div><div class="sub">جنيه</div></div>
+        <div class="dash-card c-red"><div class="icon">🛒</div><div class="label">تم صرفه</div><div class="amount" id="d-spent">0</div><div class="sub">جنيه</div></div>
+        <div class="dash-card c-blue"><div class="icon">🏦</div><div class="label">المتبقي معك</div><div class="amount" id="d-remaining">0</div><div class="sub">جنيه</div></div>
+        <div class="dash-card full c-green">
+          <div class="label">نسبة الإنجاز (تسليم من إجمالي)</div>
+          <div class="progress-wrap">
+            <div class="progress-label"><span id="prog-label-l">0 جنيه سُلّم</span><span id="prog-label-r">0%</span></div>
+            <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
           </div>
-          <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
         </div>
       </div>
+      <div class="section-title">فواتير الشهر دا</div>
+      <div id="month-count" style="font-size:.78rem;color:var(--muted);margin-bottom:10px;"></div>
+      <button class="btn-add" onclick="openModal()"><span>+</span> استلمت فاتورة جديدة</button>
+      <div class="section-title" style="margin-top:16px;">الفواتير</div>
+      <div class="invoice-list" id="invoice-list"></div>
     </div>
 
-    <div class="backup-row">
-      <button class="btn-backup export" onclick="exportData()">📤 تصدير نسخة احتياطية</button>
-      <button class="btn-backup import" onclick="document.getElementById('import-file').click()">📥 استيراد</button>
-      <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
+    <!-- PEOPLE TAB -->
+    <div class="tab-content" id="tab-people">
+      <div class="section-title">بحث باسم الشخص</div>
+      <input class="search-box" type="text" id="people-search" placeholder="🔍 ابحث باسم..." oninput="renderPeople()">
+      <div id="people-list"></div>
     </div>
 
-    <div class="section-title">فواتير الشهر دا</div>
-    <div id="month-count" style="font-size:.78rem;color:var(--muted);margin-bottom:10px;"></div>
-
-    <button class="btn-add" onclick="openModal()">
-      <span>+</span> استلمت فاتورة جديدة
-    </button>
-
-    <div class="section-title" style="margin-top:16px;">الفواتير</div>
-    <div class="invoice-list" id="invoice-list">
-      <div class="empty"><div class="big">📋</div>ملفيش فواتير لسه<br>اضغط الزر اللي فوق تضيف أول فاتورة</div>
+    <!-- HISTORY TAB -->
+    <div class="tab-content" id="tab-history">
+      <div class="section-title">سجل الفواتير</div>
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="setFilter('all',this)">الكل</button>
+        <button class="filter-btn" onclick="setFilter('pending',this)">قيد التسليم</button>
+        <button class="filter-btn" onclick="setFilter('delivered',this)">سُلّم</button>
+        <button class="filter-btn" onclick="setFilter('spent',this)">صُرف</button>
+      </div>
+      <div class="invoice-list" id="history-list"></div>
     </div>
-  </div>
 
-  <!-- TAB: PEOPLE -->
-  <div class="tab-content" id="tab-people">
-    <div class="section-title">بحث باسم الشخص</div>
-    <input class="search-box" type="text" id="people-search" placeholder="🔍 ابحث باسم..." oninput="renderPeople()">
-    <div id="people-list"></div>
-  </div>
-
-  <!-- PERSON DETAIL OVERLAY -->
-  <div class="person-detail-overlay" id="person-overlay" onclick="handlePersonOverlay(event)">
-    <div class="person-detail-modal" id="person-modal">
-      <button class="modal-close" onclick="closePersonModal()">✕</button>
-      <div class="modal-title" id="person-modal-title"></div>
-      <div id="person-modal-body"></div>
-    </div>
-  </div>
-
-  <!-- TAB: HISTORY -->
-  <div class="tab-content" id="tab-history">
-    <div class="section-title">سجل الفواتير</div>
-    <div class="filter-row">
-      <button class="filter-btn active" onclick="setFilter('all',this)">الكل</button>
-      <button class="filter-btn" onclick="setFilter('pending',this)">قيد التسليم</button>
-      <button class="filter-btn" onclick="setFilter('delivered',this)">سُلّم</button>
-      <button class="filter-btn" onclick="setFilter('spent',this)">صُرف</button>
-    </div>
-    <div class="invoice-list" id="history-list"></div>
-  </div>
-
-  <!-- TAB: STATS -->
-  <div class="tab-content" id="tab-stats">
-    <div class="section-title">إحصائيات الشهر</div>
-    <div class="dash-card full" style="margin-bottom:14px;">
-      <div class="label">مقارنة المستلم والمصروف (آخر 6 شهور)</div>
-      <div class="bar-chart" id="bar-chart"></div>
-      <div style="display:flex;gap:14px;margin-top:6px;">
-        <span style="font-size:.7rem;color:var(--accent);">■ مستلم</span>
-        <span style="font-size:.7rem;color:var(--accent3);">■ مصروف</span>
+    <!-- STATS TAB -->
+    <div class="tab-content" id="tab-stats">
+      <div class="section-title">إحصائيات الشهر</div>
+      <div class="dash-card full" style="margin-bottom:14px;">
+        <div class="label">مقارنة المستلم والمصروف (آخر 6 شهور)</div>
+        <div class="bar-chart" id="bar-chart"></div>
+        <div style="display:flex;gap:14px;margin-top:6px;">
+          <span style="font-size:.7rem;color:var(--accent);">■ مستلم</span>
+          <span style="font-size:.7rem;color:var(--accent3);">■ مصروف</span>
+        </div>
+      </div>
+      <div class="dash-grid">
+        <div class="dash-card c-yellow"><div class="label">عدد الفواتير</div><div class="amount" id="s-count">0</div><div class="sub">فاتورة</div></div>
+        <div class="dash-card c-blue"><div class="label">متوسط الفاتورة</div><div class="amount" id="s-avg">0</div><div class="sub">جنيه</div></div>
+        <div class="dash-card c-green full"><div class="label">أكبر فاتورة</div><div class="amount" id="s-max">0</div><div class="sub" id="s-max-name"></div></div>
       </div>
     </div>
-    <div class="dash-grid">
-      <div class="dash-card c-yellow">
-        <div class="label">عدد الفواتير</div>
-        <div class="amount" id="s-count">0</div>
-        <div class="sub">فاتورة</div>
-      </div>
-      <div class="dash-card c-blue">
-        <div class="label">متوسط الفاتورة</div>
-        <div class="amount" id="s-avg">0</div>
-        <div class="sub">جنيه</div>
-      </div>
-      <div class="dash-card c-green full">
-        <div class="label">أكبر فاتورة</div>
-        <div class="amount" id="s-max">0</div>
-        <div class="sub" id="s-max-name"></div>
-      </div>
-    </div>
+  </main>
+
+  <div class="bottom-nav">
+    <button class="nav-btn active" onclick="switchTab('home',this)"><span class="ico">🏠</span>الرئيسية</button>
+    <button class="nav-btn" onclick="switchTab('people',this)"><span class="ico">👥</span>الأشخاص</button>
+    <button class="nav-btn" onclick="switchTab('history',this)"><span class="ico">📋</span>السجل</button>
+    <button class="nav-btn" onclick="switchTab('stats',this)"><span class="ico">📊</span>إحصائيات</button>
   </div>
+</div>
 
-</main>
-
-<!-- BOTTOM NAV -->
-<div class="bottom-nav">
-  <button class="nav-btn active" onclick="switchTab('home',this)">
-    <span class="ico">🏠</span>الرئيسية
-  </button>
-  <button class="nav-btn" onclick="switchTab('people',this)">
-    <span class="ico">👥</span>الأشخاص
-  </button>
-  <button class="nav-btn" onclick="switchTab('history',this)">
-    <span class="ico">📋</span>السجل
-  </button>
-  <button class="nav-btn" onclick="switchTab('stats',this)">
-    <span class="ico">📊</span>إحصائيات
-  </button>
+<!-- PERSON DETAIL OVERLAY -->
+<div class="person-detail-overlay" id="person-overlay" onclick="handlePersonOverlay(event)">
+  <div class="person-detail-modal">
+    <button class="modal-close" onclick="closePersonModal()">✕</button>
+    <div class="modal-title" id="person-modal-title"></div>
+    <div id="person-modal-body"></div>
+  </div>
 </div>
 
 <!-- ADD/EDIT MODAL -->
 <div class="overlay" id="overlay" onclick="handleOverlayClick(event)">
-  <div class="modal" id="modal">
+  <div class="modal">
     <button class="modal-close" onclick="closeModal()">✕</button>
     <div class="modal-title" id="modal-title">فاتورة جديدة</div>
-
-    <div class="field">
-      <label>اسم صاحب الفاتورة</label>
-      <input type="text" id="f-name" placeholder="مثال: أحمد محمد">
-    </div>
-    <div class="field">
-      <label>المبلغ (جنيه)</label>
-      <input type="number" id="f-amount" placeholder="0" inputmode="numeric">
-    </div>
-    <div class="field">
-      <label>ملاحظات (اختياري)</label>
-      <textarea id="f-note" placeholder="أي تفاصيل إضافية..."></textarea>
-    </div>
+    <div class="field"><label>اسم صاحب الفاتورة</label><input type="text" id="f-name" placeholder="مثال: أحمد محمد"></div>
+    <div class="field"><label>المبلغ (جنيه)</label><input type="number" id="f-amount" placeholder="0" inputmode="numeric"></div>
+    <div class="field"><label>ملاحظات (اختياري)</label><textarea id="f-note" placeholder="أي تفاصيل إضافية..."></textarea></div>
     <div class="field">
       <label>صورة الفاتورة</label>
-      <div class="photo-upload" id="photo-upload-area">
-        <span style="font-size:1.8rem">📷</span>
-        <span>اضغط لرفع صورة</span>
+      <div class="photo-upload">
+        <span style="font-size:1.8rem">📷</span><span>اضغط لرفع صورة</span>
         <input type="file" accept="image/*" capture="environment" id="f-photo" onchange="handlePhoto(event)">
       </div>
       <img id="photo-preview" class="photo-preview" alt="معاينة">
@@ -546,435 +441,358 @@
   </div>
 </div>
 
-<script>
-// ─── STATE ───────────────────────────────────────────
-let invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+import { getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB8Q-a3VMbl4ok9-kM5MVgPC7RvPN9czbw",
+  authDomain: "ma7fazty-b023c.firebaseapp.com",
+  projectId: "ma7fazty-b023c",
+  storageBucket: "ma7fazty-b023c.firebasestorage.app",
+  messagingSenderId: "656857674800",
+  appId: "1:656857674800:web:15f0bf95bef8b8bbada9f5"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let invoices = [];
 let editingId = null;
 let currentFilter = 'all';
 let photoBase64 = null;
+let unsubscribe = null;
+let currentUser = null;
 
-// ─── UTILS ───────────────────────────────────────────
-function fmt(n) {
-  return Number(n||0).toLocaleString('ar-EG');
-}
-function today() {
-  return new Date().toLocaleDateString('ar-EG', {year:'numeric',month:'long',day:'numeric'});
-}
-function nowISO() { return new Date().toISOString(); }
-function monthKey(iso) {
-  const d = new Date(iso); return `${d.getFullYear()}-${d.getMonth()+1}`;
-}
-function thisMonth() {
-  const d = new Date(); return `${d.getFullYear()}-${d.getMonth()+1}`;
-}
-function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
-
-function save() { localStorage.setItem('invoices', JSON.stringify(invoices)); }
+// ── UTILS ──
+function fmt(n) { return Number(n||0).toLocaleString('ar-EG'); }
+function monthKey(iso) { const d = new Date(iso); return `${d.getFullYear()}-${d.getMonth()+1}`; }
+function thisMonth() { const d = new Date(); return `${d.getFullYear()}-${d.getMonth()+1}`; }
 
 function showToast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
+  t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-// ─── DASHBOARD ───────────────────────────────────────
-function updateDashboard() {
-  const all = invoices;
-  const total     = all.reduce((s,i) => s + (i.amount||0), 0);
-  const delivered = all.filter(i => i.delivered).reduce((s,i) => s + (i.amount||0), 0);
-  const spent     = all.reduce((s,i) => s + (i.spent||0), 0);
-  const remaining = total - delivered - spent;
-  const pct = total ? Math.round(delivered/total*100) : 0;
+function showLoading(v) { document.getElementById('loading').style.display = v ? 'flex' : 'none'; }
 
+// ── AUTH STATE ──
+onAuthStateChanged(auth, user => {
+  showLoading(false);
+  if (user) {
+    currentUser = user;
+    document.getElementById('login-page').style.display = 'none';
+    document.getElementById('app-page').style.display = 'block';
+    startListening();
+  } else {
+    currentUser = null;
+    document.getElementById('login-page').style.display = 'flex';
+    document.getElementById('app-page').style.display = 'none';
+    if (unsubscribe) { unsubscribe(); unsubscribe = null; }
+    invoices = [];
+  }
+});
+
+// ── FIRESTORE LISTENER ──
+function startListening() {
+  if (unsubscribe) unsubscribe();
+  const q = query(collection(db, 'users', currentUser.uid, 'invoices'), orderBy('createdAt', 'desc'));
+  unsubscribe = onSnapshot(q, snap => {
+    invoices = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderAll();
+  });
+}
+
+// ── AUTH FUNCTIONS ──
+window.switchLoginTab = (tab, el) => {
+  document.querySelectorAll('.login-tab').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('register-form').style.display = tab === 'register' ? 'block' : 'none';
+  document.getElementById('login-err').textContent = '';
+};
+
+window.doLogin = async () => {
+  const email = document.getElementById('l-email').value.trim();
+  const pass  = document.getElementById('l-pass').value;
+  const err   = document.getElementById('login-err');
+  if (!email || !pass) { err.textContent = '⚠️ ادخل الإيميل وكلمة المرور'; return; }
+  try {
+    showLoading(true);
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch(e) {
+    showLoading(false);
+    err.textContent = e.code === 'auth/invalid-credential' ? '⚠️ الإيميل أو كلمة المرور غلط' : '⚠️ حصل خطأ، حاول تاني';
+  }
+};
+
+window.doRegister = async () => {
+  const name  = document.getElementById('r-name').value.trim();
+  const email = document.getElementById('r-email').value.trim();
+  const pass  = document.getElementById('r-pass').value;
+  const err   = document.getElementById('login-err');
+  if (!name || !email || !pass) { err.textContent = '⚠️ ادخل كل البيانات'; return; }
+  if (pass.length < 6) { err.textContent = '⚠️ كلمة المرور 6 حروف على الأقل'; return; }
+  try {
+    showLoading(true);
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    await updateProfile(cred.user, { displayName: name });
+  } catch(e) {
+    showLoading(false);
+    err.textContent = e.code === 'auth/email-already-in-use' ? '⚠️ الإيميل ده موجود بالفعل' : '⚠️ حصل خطأ، حاول تاني';
+  }
+};
+
+window.doLogout = async () => {
+  if (!confirm('هتخرج من حسابك؟')) return;
+  await signOut(auth);
+};
+
+// ── DASHBOARD ──
+function updateDashboard() {
+  const total     = invoices.reduce((s,i) => s+(i.amount||0), 0);
+  const delivered = invoices.filter(i=>i.delivered).reduce((s,i) => s+(i.amount||0), 0);
+  const spent     = invoices.reduce((s,i) => s+(i.spent||0), 0);
+  const remaining = Math.max(0, total - delivered - spent);
+  const pct = total ? Math.round(delivered/total*100) : 0;
   document.getElementById('d-total').textContent     = fmt(total);
   document.getElementById('d-delivered').textContent = fmt(delivered);
   document.getElementById('d-spent').textContent     = fmt(spent);
-  document.getElementById('d-remaining').textContent = fmt(Math.max(0, remaining));
+  document.getElementById('d-remaining').textContent = fmt(remaining);
   document.getElementById('prog-fill').style.width   = pct + '%';
   document.getElementById('prog-label-l').textContent = fmt(delivered) + ' جنيه سُلّم';
   document.getElementById('prog-label-r').textContent = pct + '%';
-
   const thisM = invoices.filter(i => monthKey(i.createdAt) === thisMonth());
   document.getElementById('month-count').textContent =
     thisM.length ? `${thisM.length} فاتورة الشهر دا — إجمالي ${fmt(thisM.reduce((s,i)=>s+i.amount,0))} جنيه` : '';
 }
 
-// ─── RENDER INVOICE CARD ─────────────────────────────
+// ── RENDER CARD ──
 function renderCard(inv, container) {
   const card = document.createElement('div');
   card.className = 'invoice-card';
-  card.id = 'card-' + inv.id;
-
   const date = new Date(inv.createdAt).toLocaleDateString('ar-EG', {day:'numeric',month:'short',year:'numeric'});
-  const thumbHTML = inv.photo
-    ? `<div class="inv-thumb"><img src="${inv.photo}" alt=""></div>`
-    : `<div class="inv-thumb">📄</div>`;
-
+  const thumbHTML = inv.photo ? `<div class="inv-thumb"><img src="${inv.photo}" alt=""></div>` : `<div class="inv-thumb">📄</div>`;
   card.innerHTML = `
     <div class="inv-header">
       ${thumbHTML}
       <div class="inv-info">
         <div class="inv-name">${inv.name}</div>
-        <div class="inv-date">${date}${inv.note ? ' · ' + inv.note : ''}</div>
+        <div class="inv-date">${date}${inv.note ? ' · '+inv.note : ''}</div>
       </div>
       <div class="inv-amount">${fmt(inv.amount)} ج</div>
     </div>
     <div class="status-pills">
       <div class="pill received ${inv.received?'on':''}" onclick="toggleStatus('${inv.id}','received')">📥 استُلم</div>
-      <div class="pill spent ${inv.spentDone?'on':''}" onclick="toggleSpent('${inv.id}')">🛒 صُرف${inv.spent ? ' ' + fmt(inv.spent) + ' ج' : ''}</div>
+      <div class="pill spent ${inv.spentDone?'on':''}" onclick="toggleSpent('${inv.id}')">🛒 صُرف${inv.spent?' '+fmt(inv.spent)+' ج':''}</div>
       <div class="pill delivered ${inv.delivered?'on':''}" onclick="toggleStatus('${inv.id}','delivered')">✅ سُلّم</div>
     </div>
-    ${!inv.spentDone ? `
-    <div class="spent-row" id="spent-input-${inv.id}">
-      <input type="number" placeholder="المبلغ المصروف" inputmode="numeric" id="si-${inv.id}">
-      <button onclick="logSpent('${inv.id}')">تسجيل</button>
-    </div>` : ''}
+    ${!inv.spentDone ? `<div class="spent-row"><input type="number" placeholder="المبلغ المصروف" inputmode="numeric" id="si-${inv.id}"><button onclick="logSpent('${inv.id}')">تسجيل</button></div>` : ''}
     <div class="inv-actions">
       <button class="btn-sm btn-edit" onclick="openModal('${inv.id}')">✏️ تعديل</button>
       <button class="btn-sm btn-del" onclick="deleteInvoice('${inv.id}')">🗑 حذف</button>
-    </div>
-  `;
+    </div>`;
   container.appendChild(card);
 }
 
-// ─── RENDER ALL ───────────────────────────────────────
 function renderAll() {
   updateDashboard();
-
-  // Home list (this month)
   const homeList = document.getElementById('invoice-list');
   homeList.innerHTML = '';
   const homeItems = invoices.filter(i => monthKey(i.createdAt) === thisMonth());
-  if (!homeItems.length) {
-    homeList.innerHTML = '<div class="empty"><div class="big">📋</div>ملفيش فواتير الشهر دا<br>اضغط الزر اللي فوق تضيف</div>';
-  } else {
-    [...homeItems].reverse().forEach(i => renderCard(i, homeList));
-  }
+  if (!homeItems.length) homeList.innerHTML = '<div class="empty"><div class="big">📋</div>ملفيش فواتير الشهر دا</div>';
+  else homeItems.forEach(i => renderCard(i, homeList));
 
-  // History list (filtered)
   const histList = document.getElementById('history-list');
   histList.innerHTML = '';
-  let items = [...invoices].reverse();
+  let items = [...invoices];
   if (currentFilter === 'pending')   items = items.filter(i => !i.delivered);
   if (currentFilter === 'delivered') items = items.filter(i => i.delivered);
   if (currentFilter === 'spent')     items = items.filter(i => i.spentDone);
-  if (!items.length) {
-    histList.innerHTML = '<div class="empty"><div class="big">🔍</div>ملفيش نتائج</div>';
-  } else {
-    items.forEach(i => renderCard(i, histList));
-  }
+  if (!items.length) histList.innerHTML = '<div class="empty"><div class="big">🔍</div>ملفيش نتائج</div>';
+  else items.forEach(i => renderCard(i, histList));
 
-  updateStats();
-  updateBarChart();
+  updateStats(); updateBarChart();
 }
 
-// ─── TOGGLE STATUS ────────────────────────────────────
-function toggleStatus(id, field) {
-  const inv = invoices.find(i => i.id === id);
-  if (!inv) return;
-  inv[field] = !inv[field];
-  save(); renderAll();
-  showToast(field === 'received' ? (inv.received ? '✅ تم تسجيل الاستلام' : 'تم الإلغاء') : (inv.delivered ? '✅ تم تسجيل التسليم' : 'تم الإلغاء'));
-}
+// ── FIRESTORE ACTIONS ──
+function col() { return collection(db, 'users', currentUser.uid, 'invoices'); }
+function docRef(id) { return doc(db, 'users', currentUser.uid, 'invoices', id); }
 
-function toggleSpent(id) {
-  // just focus input if exists
-  const el = document.getElementById('si-' + id);
+window.toggleStatus = async (id, field) => {
+  const inv = invoices.find(i => i.id === id); if (!inv) return;
+  const val = !inv[field];
+  await updateDoc(docRef(id), { [field]: val });
+  showToast(field === 'delivered' ? (val ? '✅ تم تسجيل التسليم' : 'تم الإلغاء') : (val ? '✅ تم تسجيل الاستلام' : 'تم الإلغاء'));
+};
+
+window.toggleSpent = (id) => {
+  const el = document.getElementById('si-'+id);
   if (el) { el.focus(); return; }
   const inv = invoices.find(i => i.id === id);
-  if (inv && inv.spentDone) { inv.spentDone = false; inv.spent = 0; save(); renderAll(); showToast('تم إلغاء الصرف'); }
-}
+  if (inv?.spentDone) { updateDoc(docRef(id), { spentDone: false, spent: 0 }); showToast('تم إلغاء الصرف'); }
+};
 
-function logSpent(id) {
-  const inv = invoices.find(i => i.id === id);
-  const val = parseFloat(document.getElementById('si-' + id)?.value);
-  if (!inv || !val || val <= 0) { showToast('⚠️ أدخل مبلغ صحيح'); return; }
-  inv.spent = val;
-  inv.spentDone = true;
-  save(); renderAll();
+window.logSpent = async (id) => {
+  const val = parseFloat(document.getElementById('si-'+id)?.value);
+  if (!val || val <= 0) { showToast('⚠️ أدخل مبلغ صحيح'); return; }
+  await updateDoc(docRef(id), { spent: val, spentDone: true });
   showToast(`💸 تم تسجيل صرف ${fmt(val)} جنيه`);
-}
+};
 
-// ─── DELETE ───────────────────────────────────────────
-function deleteInvoice(id) {
+window.deleteInvoice = async (id) => {
   if (!confirm('هتحذف الفاتورة دي؟')) return;
-  invoices = invoices.filter(i => i.id !== id);
-  save(); renderAll();
+  await deleteDoc(docRef(id));
   showToast('🗑 تم الحذف');
-}
+};
 
-// ─── MODAL ────────────────────────────────────────────
-function openModal(id = null) {
-  editingId = id;
-  photoBase64 = null;
+// ── MODAL ──
+window.openModal = (id = null) => {
+  editingId = id; photoBase64 = null;
   document.getElementById('photo-preview').style.display = 'none';
   document.getElementById('modal-title').textContent = id ? '✏️ تعديل الفاتورة' : 'فاتورة جديدة';
-
   if (id) {
     const inv = invoices.find(i => i.id === id);
     document.getElementById('f-name').value   = inv.name || '';
     document.getElementById('f-amount').value = inv.amount || '';
     document.getElementById('f-note').value   = inv.note || '';
-    if (inv.photo) {
-      photoBase64 = inv.photo;
-      const prev = document.getElementById('photo-preview');
-      prev.src = inv.photo; prev.style.display = 'block';
-    }
+    if (inv.photo) { photoBase64 = inv.photo; const p = document.getElementById('photo-preview'); p.src = inv.photo; p.style.display = 'block'; }
   } else {
-    document.getElementById('f-name').value   = '';
+    document.getElementById('f-name').value = '';
     document.getElementById('f-amount').value = '';
-    document.getElementById('f-note').value   = '';
+    document.getElementById('f-note').value = '';
   }
   document.getElementById('overlay').classList.add('show');
-}
+};
+window.closeModal = () => document.getElementById('overlay').classList.remove('show');
+window.handleOverlayClick = e => { if (e.target === document.getElementById('overlay')) closeModal(); };
 
-function closeModal() { document.getElementById('overlay').classList.remove('show'); }
-function handleOverlayClick(e) { if (e.target === document.getElementById('overlay')) closeModal(); }
-
-function handlePhoto(e) {
-  const file = e.target.files[0];
-  if (!file) return;
+window.handlePhoto = (e) => {
+  const file = e.target.files[0]; if (!file) return;
   const reader = new FileReader();
   reader.onload = ev => {
-    photoBase64 = ev.target.result;
-    const prev = document.getElementById('photo-preview');
-    prev.src = photoBase64; prev.style.display = 'block';
+    const img = new Image();
+    img.onload = () => {
+      const maxW = 600, scale = img.width > maxW ? maxW/img.width : 1;
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width*scale; canvas.height = img.height*scale;
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      photoBase64 = canvas.toDataURL('image/jpeg', 0.6);
+      const p = document.getElementById('photo-preview'); p.src = photoBase64; p.style.display = 'block';
+    };
+    img.src = ev.target.result;
   };
   reader.readAsDataURL(file);
-}
+};
 
-function saveInvoice() {
+window.saveInvoice = async () => {
   const name   = document.getElementById('f-name').value.trim();
   const amount = parseFloat(document.getElementById('f-amount').value);
   const note   = document.getElementById('f-note').value.trim();
-
-  if (!name)          { showToast('⚠️ اكتب اسم صاحب الفاتورة'); return; }
+  if (!name)   { showToast('⚠️ اكتب اسم صاحب الفاتورة'); return; }
   if (!amount || amount <= 0) { showToast('⚠️ أدخل مبلغ صحيح'); return; }
+  try {
+    if (editingId) {
+      const upd = { name, amount, note };
+      if (photoBase64) upd.photo = photoBase64;
+      await updateDoc(docRef(editingId), upd);
+      showToast('✅ تم التعديل');
+    } else {
+      await addDoc(col(), {
+        name, amount, note, photo: photoBase64 || null,
+        received: true, delivered: false, spent: 0, spentDone: false,
+        createdAt: new Date().toISOString()
+      });
+      showToast('✅ تم إضافة الفاتورة');
+    }
+    closeModal();
+  } catch(e) { showToast('⚠️ حصل خطأ، حاول تاني'); }
+};
 
-  if (editingId) {
-    const inv = invoices.find(i => i.id === editingId);
-    inv.name = name; inv.amount = amount; inv.note = note;
-    if (photoBase64) inv.photo = photoBase64;
-  } else {
-    invoices.push({
-      id: uid(), name, amount, note,
-      photo: photoBase64 || null,
-      received: true, delivered: false, spent: 0, spentDone: false,
-      createdAt: nowISO()
-    });
-  }
-
-  save(); renderAll(); closeModal();
-  showToast(editingId ? '✅ تم التعديل' : '✅ تم إضافة الفاتورة');
-}
-
-// ─── FILTER ───────────────────────────────────────────
-function setFilter(f, el) {
+// ── FILTER ──
+window.setFilter = (f, el) => {
   currentFilter = f;
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  renderAll();
-}
+  el.classList.add('active'); renderAll();
+};
 
-// ─── STATS ────────────────────────────────────────────
+// ── STATS ──
 function updateStats() {
-  const all = invoices;
-  document.getElementById('s-count').textContent = all.length;
-  const avg = all.length ? Math.round(all.reduce((s,i)=>s+i.amount,0)/all.length) : 0;
+  document.getElementById('s-count').textContent = invoices.length;
+  const avg = invoices.length ? Math.round(invoices.reduce((s,i)=>s+i.amount,0)/invoices.length) : 0;
   document.getElementById('s-avg').textContent = fmt(avg);
-  const max = all.length ? all.reduce((a,b) => a.amount > b.amount ? a : b) : null;
+  const max = invoices.length ? invoices.reduce((a,b)=>a.amount>b.amount?a:b) : null;
   document.getElementById('s-max').textContent = max ? fmt(max.amount) : '0';
   document.getElementById('s-max-name').textContent = max ? max.name : '';
 }
 
 function updateBarChart() {
-  const chart = document.getElementById('bar-chart');
-  chart.innerHTML = '';
+  const chart = document.getElementById('bar-chart'); chart.innerHTML = '';
   const months = [];
-  for (let i = 5; i >= 0; i--) {
-    const d = new Date(); d.setMonth(d.getMonth() - i);
-    months.push({ key: `${d.getFullYear()}-${d.getMonth()+1}`, label: d.toLocaleDateString('ar-EG', {month:'short'}) });
-  }
-  const maxVal = Math.max(...months.map(m => {
-    const inv = invoices.filter(i => monthKey(i.createdAt) === m.key);
-    return Math.max(inv.reduce((s,i)=>s+i.amount,0), inv.reduce((s,i)=>s+i.spent,0));
-  }), 1);
-
+  for (let i=5; i>=0; i--) { const d=new Date(); d.setMonth(d.getMonth()-i); months.push({key:`${d.getFullYear()}-${d.getMonth()+1}`,label:d.toLocaleDateString('ar-EG',{month:'short'})}); }
+  const maxVal = Math.max(...months.map(m => { const inv=invoices.filter(i=>monthKey(i.createdAt)===m.key); return Math.max(inv.reduce((s,i)=>s+i.amount,0),inv.reduce((s,i)=>s+i.spent,0)); }),1);
   months.forEach(m => {
-    const inv = invoices.filter(i => monthKey(i.createdAt) === m.key);
-    const total = inv.reduce((s,i)=>s+i.amount,0);
-    const spent = inv.reduce((s,i)=>s+i.spent,0);
-    const col = document.createElement('div');
-    col.className = 'bar-col';
-    col.innerHTML = `
-      <div style="display:flex;gap:2px;align-items:flex-end;height:70px;width:100%;">
-        <div class="bar" style="flex:1;height:${Math.round(total/maxVal*70)}px;background:var(--accent);opacity:.8;"></div>
-        <div class="bar" style="flex:1;height:${Math.round(spent/maxVal*70)}px;background:var(--accent3);opacity:.8;"></div>
-      </div>
-      <div class="bar-label">${m.label}</div>`;
-    chart.appendChild(col);
+    const inv=invoices.filter(i=>monthKey(i.createdAt)===m.key);
+    const total=inv.reduce((s,i)=>s+i.amount,0), spent=inv.reduce((s,i)=>s+i.spent,0);
+    const col2=document.createElement('div'); col2.className='bar-col';
+    col2.innerHTML=`<div style="display:flex;gap:2px;align-items:flex-end;height:70px;width:100%;"><div class="bar" style="flex:1;height:${Math.round(total/maxVal*70)}px;background:var(--accent);opacity:.8;"></div><div class="bar" style="flex:1;height:${Math.round(spent/maxVal*70)}px;background:var(--accent3);opacity:.8;"></div></div><div class="bar-label">${m.label}</div>`;
+    chart.appendChild(col2);
   });
 }
 
-// ─── BACKUP / RESTORE ────────────────────────────────
-function exportData() {
-  const data = JSON.stringify(invoices, null, 2);
-  const blob = new Blob([data], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  const date = new Date().toISOString().slice(0,10);
-  a.href = url; a.download = `محفظتي-${date}.json`;
-  a.click(); URL.revokeObjectURL(url);
-  showToast('📤 تم تصدير النسخة الاحتياطية');
-}
-
-function importData(e) {
-  const file = e.target.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    try {
-      const data = JSON.parse(ev.target.result);
-      if (!Array.isArray(data)) throw new Error();
-      if (!confirm(`هيتم استيراد ${data.length} فاتورة. هل أنت متأكد؟`)) return;
-      invoices = data; save(); renderAll();
-      showToast(`✅ تم استيراد ${data.length} فاتورة`);
-    } catch { showToast('⚠️ الملف مش صحيح'); }
-  };
-  reader.readAsText(file);
-  e.target.value = '';
-}
-
-// ─── PEOPLE TAB ──────────────────────────────────────
+// ── PEOPLE ──
 function getMonths6() {
-  const months = [];
-  for (let i = 5; i >= 0; i--) {
-    const d = new Date(); d.setMonth(d.getMonth() - i);
-    months.push({
-      key: `${d.getFullYear()}-${d.getMonth()+1}`,
-      label: d.toLocaleDateString('ar-EG', {month:'long', year:'numeric'})
-    });
-  }
-  return months;
+  const months=[]; for(let i=5;i>=0;i--){const d=new Date();d.setMonth(d.getMonth()-i);months.push({key:`${d.getFullYear()}-${d.getMonth()+1}`,label:d.toLocaleDateString('ar-EG',{month:'long',year:'numeric'})});} return months;
 }
 
-function renderPeople() {
-  const search = (document.getElementById('people-search')?.value || '').trim().toLowerCase();
-  const list = document.getElementById('people-list');
-  list.innerHTML = '';
-
-  // Group by name
-  const people = {};
-  invoices.forEach(inv => {
-    const key = inv.name.trim();
-    if (!people[key]) people[key] = [];
-    people[key].push(inv);
-  });
-
-  let names = Object.keys(people);
-  if (search) names = names.filter(n => n.toLowerCase().includes(search));
+window.renderPeople = () => {
+  const search=(document.getElementById('people-search')?.value||'').trim().toLowerCase();
+  const list=document.getElementById('people-list'); list.innerHTML='';
+  const people={};
+  invoices.forEach(inv=>{const k=inv.name.trim();if(!people[k])people[k]=[];people[k].push(inv);});
+  let names=Object.keys(people);
+  if(search) names=names.filter(n=>n.toLowerCase().includes(search));
   names.sort();
-
-  if (!names.length) {
-    list.innerHTML = '<div class="empty"><div class="big">👥</div>' + (search ? 'ملقتش نتيجة' : 'ملفيش بيانات لسه') + '</div>';
-    return;
-  }
-
-  const months6 = getMonths6();
-
-  names.forEach(name => {
-    const invs = people[name];
-    const total = invs.reduce((s,i) => s+i.amount, 0);
-    const count = invs.length;
-    const initials = name.trim().split(' ').map(w=>w[0]).join('').slice(0,2);
-
-    // Per-month breakdown (last 6 months)
-    const monthRows = months6.map(m => {
-      const mi = invs.filter(i => monthKey(i.createdAt) === m.key);
-      if (!mi.length) return null;
-      return { label: m.label, count: mi.length, amount: mi.reduce((s,i)=>s+i.amount,0) };
-    }).filter(Boolean);
-
-    const card = document.createElement('div');
-    card.className = 'person-card';
-    card.innerHTML = `
-      <div class="person-header" onclick="openPersonModal('${name.replace(/'/g,"\\'")}')">
-        <div class="person-avatar">${initials}</div>
-        <div class="person-info">
-          <div class="person-name">${name}</div>
-          <div class="person-sub">${count} فاتورة في آخر 6 شهور</div>
-        </div>
-        <div class="person-total">${fmt(total)} ج</div>
-      </div>
-      ${monthRows.length ? `
-      <div class="person-months">
-        ${monthRows.map(r => `
-          <div class="month-row">
-            <span class="m-label">${r.label}</span>
-            <div class="m-stats">
-              <span class="m-count">${r.count} فاتورة</span>
-              <span class="m-amount">${fmt(r.amount)} ج</span>
-            </div>
-          </div>`).join('')}
-      </div>` : ''}
-    `;
+  if(!names.length){list.innerHTML='<div class="empty"><div class="big">👥</div>'+(search?'ملقتش نتيجة':'ملفيش بيانات لسه')+'</div>';return;}
+  const months6=getMonths6();
+  names.forEach(name=>{
+    const invs=people[name];
+    const total=invs.reduce((s,i)=>s+i.amount,0);
+    const initials=name.trim().split(' ').map(w=>w[0]).join('').slice(0,2);
+    const monthRows=months6.map(m=>{const mi=invs.filter(i=>monthKey(i.createdAt)===m.key);if(!mi.length)return null;return{label:m.label,count:mi.length,amount:mi.reduce((s,i)=>s+i.amount,0)};}).filter(Boolean);
+    const card=document.createElement('div'); card.className='person-card';
+    card.innerHTML=`<div class="person-header" onclick="openPersonModal('${name.replace(/'/g,"\\'")}')"><div class="person-avatar">${initials}</div><div class="person-info"><div class="person-name">${name}</div><div class="person-sub">${invs.length} فاتورة</div></div><div class="person-total">${fmt(total)} ج</div></div>${monthRows.length?`<div class="person-months">${monthRows.map(r=>`<div class="month-row"><span class="m-label">${r.label}</span><div class="m-stats"><span class="m-count">${r.count} فاتورة</span><span class="m-amount">${fmt(r.amount)} ج</span></div></div>`).join('')}</div>`:''}`;
     list.appendChild(card);
   });
-}
+};
 
-function openPersonModal(name) {
-  const invs = invoices.filter(i => i.name.trim() === name.trim());
-  const months6 = getMonths6();
-  document.getElementById('person-modal-title').textContent = '👤 ' + name;
-
-  const total = invs.reduce((s,i)=>s+i.amount,0);
-  const delivered = invs.filter(i=>i.delivered).reduce((s,i)=>s+i.amount,0);
-  const spent = invs.reduce((s,i)=>s+i.spent,0);
-
-  let html = `
-    <div class="dash-grid" style="margin-bottom:16px;">
-      <div class="dash-card c-yellow"><div class="label">إجمالي</div><div class="amount">${fmt(total)}</div><div class="sub">جنيه</div></div>
-      <div class="dash-card c-blue"><div class="label">عدد الفواتير</div><div class="amount">${invs.length}</div><div class="sub">فاتورة</div></div>
-      <div class="dash-card c-green"><div class="label">سُلّم</div><div class="amount">${fmt(delivered)}</div><div class="sub">جنيه</div></div>
-      <div class="dash-card c-red"><div class="label">صُرف</div><div class="amount">${fmt(spent)}</div><div class="sub">جنيه</div></div>
-    </div>
-    <div class="section-title">تفاصيل آخر 6 شهور</div>
-  `;
-
-  months6.forEach(m => {
-    const mi = invs.filter(i => monthKey(i.createdAt) === m.key);
-    if (!mi.length) return;
-    html += `<div style="margin-bottom:12px;">
-      <div style="font-size:.78rem;color:var(--muted);font-weight:700;margin-bottom:6px;">${m.label}</div>`;
-    mi.forEach(inv => {
-      const d = new Date(inv.createdAt).toLocaleDateString('ar-EG',{day:'numeric',month:'short'});
-      html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:1px solid var(--border);font-size:.82rem;">
-        <span>${d} ${inv.note ? '· '+inv.note : ''}</span>
-        <span style="font-weight:700;color:var(--accent)">${fmt(inv.amount)} ج</span>
-      </div>`;
-    });
-    html += `</div>`;
-  });
-
-  document.getElementById('person-modal-body').innerHTML = html;
+window.openPersonModal = (name) => {
+  const invs=invoices.filter(i=>i.name.trim()===name.trim());
+  const months6=getMonths6();
+  document.getElementById('person-modal-title').textContent='👤 '+name;
+  const total=invs.reduce((s,i)=>s+i.amount,0);
+  const delivered=invs.filter(i=>i.delivered).reduce((s,i)=>s+i.amount,0);
+  const spent=invs.reduce((s,i)=>s+i.spent,0);
+  let html=`<div class="dash-grid" style="margin-bottom:16px;"><div class="dash-card c-yellow"><div class="label">إجمالي</div><div class="amount">${fmt(total)}</div><div class="sub">جنيه</div></div><div class="dash-card c-blue"><div class="label">عدد الفواتير</div><div class="amount">${invs.length}</div><div class="sub">فاتورة</div></div><div class="dash-card c-green"><div class="label">سُلّم</div><div class="amount">${fmt(delivered)}</div><div class="sub">جنيه</div></div><div class="dash-card c-red"><div class="label">صُرف</div><div class="amount">${fmt(spent)}</div><div class="sub">جنيه</div></div></div><div class="section-title">تفاصيل آخر 6 شهور</div>`;
+  months6.forEach(m=>{const mi=invs.filter(i=>monthKey(i.createdAt)===m.key);if(!mi.length)return;html+=`<div style="margin-bottom:12px;"><div style="font-size:.78rem;color:var(--muted);font-weight:700;margin-bottom:6px;">${m.label}</div>`;mi.forEach(inv=>{const d=new Date(inv.createdAt).toLocaleDateString('ar-EG',{day:'numeric',month:'short'});html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:1px solid var(--border);font-size:.82rem;"><span>${d}${inv.note?' · '+inv.note:''}</span><span style="font-weight:700;color:var(--accent)">${fmt(inv.amount)} ج</span></div>`;});html+=`</div>`;});
+  document.getElementById('person-modal-body').innerHTML=html;
   document.getElementById('person-overlay').classList.add('show');
-}
+};
+window.closePersonModal = () => document.getElementById('person-overlay').classList.remove('show');
+window.handlePersonOverlay = e => { if(e.target===document.getElementById('person-overlay'))closePersonModal(); };
 
-function closePersonModal() { document.getElementById('person-overlay').classList.remove('show'); }
-function handlePersonOverlay(e) { if (e.target === document.getElementById('person-overlay')) closePersonModal(); }
-
-// ─── TABS ─────────────────────────────────────────────
-function switchTab(name, btn) {
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
+// ── TABS ──
+window.switchTab = (name, btn) => {
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
   btn.classList.add('active');
-  if (name === 'people') renderPeople();
-}
-
-// ─── INIT ─────────────────────────────────────────────
-document.getElementById('today-date').textContent = today();
-renderAll();
+  if(name==='people') renderPeople();
+};
 </script>
 </body>
 </html>
