@@ -166,8 +166,15 @@ main{padding:16px;max-width:480px;margin:auto;padding-bottom:30px;}
 .bulk-row:last-child{border-bottom:none;}
 .bulk-name{font-weight:700;font-size:.88rem;}
 .bulk-sub{font-size:.7rem;color:var(--muted);margin-top:1px;}
-.bulk-inp{width:105px;background:var(--card2);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:'Cairo',sans-serif;font-size:.82rem;padding:7px 9px;outline:none;text-align:center;}
-.bulk-inp:focus{border-color:var(--accent3);}
+.bulk-person-header{font-size:.72rem;font-weight:700;color:var(--accent4);padding:10px 0 4px;border-bottom:1px solid var(--border);margin-bottom:2px;}
+.bulk-check-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+.bulk-check-row:last-child{border-bottom:none;}
+.bulk-check-row.selected{background:rgba(16,185,129,.08);border-radius:8px;padding:10px 8px;}
+.bulk-checkbox{width:22px;height:22px;border-radius:6px;border:2px solid var(--border);background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;transition:all .15s;}
+.bulk-checkbox.checked{background:var(--accent2);border-color:var(--accent2);}
+.bulk-inv-info{flex:1;}
+.bulk-inv-note{font-size:.72rem;color:var(--muted);}
+.bulk-inv-amt{font-weight:900;color:var(--accent);font-size:.95rem;}
 
 /* MONTH BROWSER */
 .month-picker select{width:100%;background:var(--card);border:1.5px solid var(--border);border-radius:12px;color:var(--text);font-family:'Cairo',sans-serif;font-size:.88rem;padding:10px 13px;outline:none;margin-bottom:12px;}
@@ -415,7 +422,8 @@ main{padding:16px;max-width:480px;margin:auto;padding-bottom:30px;}
   <div class="modal">
     <button class="modal-close" onclick="closeBulkModal()">✕</button>
     <div class="modal-title">💸 صرف جماعي</div>
-    <p style="font-size:.78rem;color:var(--muted);margin-bottom:16px;text-align:center;">ادخل المبلغ الكلي لكل شخص — هيتوزع تلقائياً على فواتيره</p>
+    <p style="font-size:.78rem;color:var(--muted);margin-bottom:4px;text-align:center;">اختار الفواتير اللي اتصرفت انهاردة ✓</p>
+    <div id="bulk-selected-total" style="text-align:center;font-size:1rem;font-weight:900;color:var(--accent);margin-bottom:14px;">المحدد: 0 ج</div>
     <div id="bulk-people-list"></div>
     <button class="btn-save" style="margin-top:14px;" onclick="saveBulkSpend()">💾 تسجيل الصرف</button>
   </div>
@@ -669,33 +677,67 @@ window.saveInvoice=async()=>{
 };
 
 // ── BULK ──
+let bulkSelected=new Set();
+function updateBulkTotal(){
+  const total=[...bulkSelected].reduce((s,id)=>{const inv=invoices.find(i=>i.id===id);return s+(inv?.amount||0);},0);
+  document.getElementById('bulk-selected-total').textContent=`المحدد: ${fmt(total)} ج`;
+}
+window.toggleBulkCheck=id=>{
+  if(bulkSelected.has(id))bulkSelected.delete(id);else bulkSelected.add(id);
+  const row=document.getElementById('bulk-row-'+id);
+  const chk=document.getElementById('bulk-chk-'+id);
+  if(row&&chk){
+    row.classList.toggle('selected',bulkSelected.has(id));
+    chk.classList.toggle('checked',bulkSelected.has(id));
+    chk.textContent=bulkSelected.has(id)?'✓':'';
+  }
+  updateBulkTotal();
+};
 window.openBulkModal=()=>{
+  bulkSelected=new Set();
+  const unspent=invoices.filter(i=>!i.spentDone);
+  if(!unspent.length){showToast('كل الفواتير اتسجل ليها صرف ✅');return;}
+  // group by person
   const people={};
-  invoices.filter(i=>!i.spentDone&&monthKey(i.createdAt)===thisMonth()).forEach(i=>{
-    if(!people[i.name])people[i.name]={count:0,total:0,ids:[]};
-    people[i.name].count++;people[i.name].total+=i.amount;people[i.name].ids.push(i.id);
-  });
-  const names=Object.keys(people);
-  if(!names.length){showToast('كل الفواتير اتسجل ليها صرف ✅');return;}
+  unspent.forEach(i=>{if(!people[i.name])people[i.name]=[];people[i.name].push(i);});
   const listEl=document.getElementById('bulk-people-list');
-  listEl.innerHTML=names.map(n=>`<div class="bulk-row"><div><div class="bulk-name">${n}</div><div class="bulk-sub">${people[n].count} فاتورة — ${fmt(people[n].total)} ج</div></div><input class="bulk-inp" type="number" inputmode="numeric" placeholder="0 ج" id="bulk-${n.replace(/\s/g,'_')}"></div>`).join('');
-  listEl._people=people;
+  listEl.innerHTML='';
+  Object.keys(people).sort().forEach(name=>{
+    const header=document.createElement('div');
+    header.className='bulk-person-header';
+    header.textContent='👤 '+name;
+    listEl.appendChild(header);
+    people[name].forEach(inv=>{
+      const date=new Date(inv.createdAt).toLocaleDateString('ar-EG',{day:'numeric',month:'short'});
+      const row=document.createElement('div');
+      row.className='bulk-check-row';
+      row.id='bulk-row-'+inv.id;
+      row.onclick=()=>toggleBulkCheck(inv.id);
+      row.innerHTML=`
+        <div class="bulk-checkbox" id="bulk-chk-${inv.id}"></div>
+        <div class="bulk-inv-info">
+          <div class="bulk-name">${date}${inv.note?' · '+inv.note:''}</div>
+          <div class="bulk-inv-note">رقم الفاتورة: ${inv.id.slice(-6)}</div>
+        </div>
+        <div class="bulk-inv-amt">${fmt(inv.amount)} ج</div>`;
+      listEl.appendChild(row);
+    });
+  });
+  document.getElementById('bulk-selected-total').textContent='المحدد: 0 ج';
   document.getElementById('bulk-overlay').classList.add('show');
 };
 window.closeBulkModal=()=>document.getElementById('bulk-overlay').classList.remove('show');
 window.saveBulkSpend=async()=>{
-  const listEl=document.getElementById('bulk-people-list');
-  const people=listEl._people;
-  const batch=writeBatch(db);let done=0;
-  for(const name of Object.keys(people)){
-    const val=parseFloat(document.getElementById('bulk-'+name.replace(/\s/g,'_'))?.value);
-    if(!val||val<=0)continue;
-    const ids=people[name].ids;
-    const share=Math.round(val/ids.length*100)/100;
-    ids.forEach(id=>batch.update(iDoc(id),{spent:share,spentDone:true}));done++;
-  }
-  if(!done){showToast('⚠️ ماكتبتش أي مبلغ');return;}
-  await batch.commit();closeBulkModal();showToast(`✅ تم الصرف لـ ${done} أشخاص`);
+  if(!bulkSelected.size){showToast('⚠️ ماختارتش أي فاتورة');return;}
+  const batch=writeBatch(db);
+  bulkSelected.forEach(id=>{
+    const inv=invoices.find(i=>i.id===id);
+    if(inv) batch.update(iDoc(id),{spent:inv.amount,spentDone:true});
+  });
+  await batch.commit();
+  closeBulkModal();
+  showToast(`✅ تم تسجيل صرف ${bulkSelected.size} فاتورة — ${fmt([...bulkSelected].reduce((s,id)=>{const inv=invoices.find(i=>i.id===id);return s+(inv?.amount||0);},0))} ج`);
+  bulkSelected=new Set();
 };
 
 // ── FILTER / HISTORY ──
