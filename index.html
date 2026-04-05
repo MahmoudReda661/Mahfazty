@@ -328,8 +328,8 @@ main{padding:16px;max-width:480px;margin:auto;padding-bottom:30px;}
       <div class="section-title">متابعة غسيل العربيات</div>
       <div id="wash-month-label" style="font-size:.76rem;color:var(--muted);margin-bottom:12px;"></div>
       <div class="dash-grid" style="margin-bottom:14px;">
-        <div class="dash-card c-g"><div class="lbl">عربيات اتغسلت</div><div class="val" id="wash-done">0</div><div class="sub">عربية</div></div>
-        <div class="dash-card c-r"><div class="lbl">لسه ممغسلتش</div><div class="val" id="wash-pending">0</div><div class="sub">عربية</div></div>
+        <div class="dash-card c-g"><div class="lbl">اتغسلت كامل</div><div class="val" id="wash-done">0</div><div class="sub">عربية</div></div>
+        <div class="dash-card c-r"><div class="lbl">لسه فيها غسيل</div><div class="val" id="wash-pending">0</div><div class="sub">عربية</div></div>
       </div>
       <div id="wash-list"></div>
     </div>
@@ -865,6 +865,35 @@ function renderVehicles(){
 }
 
 // ── WASHING ──
+let washLogs=[];
+function wCol(){return collection(db,'users',currentUser.uid,'washing');}
+function wDoc(id){return doc(db,'users',currentUser.uid,'washing',id);}
+
+// add washing listener to startListening
+const _origStart=startListening;
+function startListening(){
+  unsubs.forEach(u=>u());unsubs=[];
+  unsubs.push(onSnapshot(query(iCol(),orderBy('createdAt','desc')),snap=>{invoices=snap.docs.map(d=>({id:d.id,...d.data()}));renderInvoices();populateMonthSelect();updateNamesList();}));
+  unsubs.push(onSnapshot(query(vCol(),orderBy('createdAt','asc')),snap=>{vehicles=snap.docs.map(d=>({id:d.id,...d.data()}));renderVehicles();renderWashing();}));
+  unsubs.push(onSnapshot(query(oCol(),orderBy('date','desc')),snap=>{octaneLogs=snap.docs.map(d=>({id:d.id,...d.data()}));renderOctane();}));
+  unsubs.push(onSnapshot(query(wCol(),orderBy('date','desc')),snap=>{washLogs=snap.docs.map(d=>({id:d.id,...d.data()}));renderWashing();}));
+}
+
+window.addWash=async(vehicleId)=>{
+  const tm=thisMonth();
+  const count=washLogs.filter(w=>w.vehicleId===vehicleId&&w.month===tm).length;
+  if(count>=2){showToast('⛔ وصل الحد الأقصى لهذا الشهر');return;}
+  const v=vehicles.find(v=>v.id===vehicleId);
+  await addDoc(wCol(),{vehicleId,plate:v.plate,driver:v.driver,month:tm,date:todayISO()});
+  showToast(`✅ تم تسجيل غسيل ${v.plate}`);
+};
+
+window.undoWash=async(washId,plate)=>{
+  if(!confirm(`هتلغي تسجيل الغسيل دا لـ ${plate}؟`))return;
+  await deleteDoc(wDoc(washId));
+  showToast('تم الإلغاء');
+};
+
 function renderWashing(){
   const tm=thisMonth();
   const d=new Date();
@@ -872,28 +901,43 @@ function renderWashing(){
   const list=document.getElementById('wash-list');list.innerHTML='';
   if(!vehicles.length){list.innerHTML='<div class="empty"><div class="big">🚿</div>ملفيش عربيات — أضف من صفحة العربيات</div>';return;}
 
-  // count wash invoices per vehicle this month
-  const washCounts={};
-  invoices.filter(i=>monthKey(i.createdAt)===tm&&i.note&&i.note.includes('غسيل')).forEach(i=>{
-    const v=vehicles.find(v=>i.name.includes(v.plate)||i.note.includes(v.plate));
-    if(v){washCounts[v.id]=(washCounts[v.id]||0)+1;}
-  });
-
   let done=0,pending=0;
   vehicles.forEach(v=>{
-    const count=washCounts[v.id]||0;
+    const vWashes=washLogs.filter(w=>w.vehicleId===v.id&&w.month===tm);
+    const count=vWashes.length;
     const full=count>=2;
     if(full)done++;else pending++;
+
     const card=document.createElement('div');card.className='wash-car-card';
+
+    const washDotsHTML=`
+      <div class="wash-dots">
+        ${[0,1].map(i=>{
+          const w=vWashes[i];
+          return w
+            ? `<div class="wash-dot used" title="${w.date}" onclick="undoWash('${w.id}','${v.plate}')">✓</div>`
+            : `<div class="wash-dot empty">${i+1}</div>`;
+        }).join('')}
+      </div>`;
+
+    const washHistHTML=vWashes.length?`
+      <div style="margin-top:8px;font-size:.7rem;color:var(--muted);">
+        ${vWashes.map(w=>`<span style="margin-left:8px;">🚿 ${new Date(w.date).toLocaleDateString('ar-EG',{day:'numeric',month:'short'})}</span>`).join('')}
+      </div>`:'';
+
     card.innerHTML=`
       <div class="wash-car-head">
-        <div><div class="wash-car-plate">${v.plate}</div><div class="wash-car-driver">👤 ${v.driver} · ${v.type}</div></div>
-        <div class="wash-dots">
-          <div class="wash-dot ${count>=1?'used':'empty'}">${count>=1?'✓':'1'}</div>
-          <div class="wash-dot ${count>=2?'used':'empty'}">${count>=2?'✓':'2'}</div>
+        <div>
+          <div class="wash-car-plate">${v.plate}</div>
+          <div class="wash-car-driver">👤 ${v.driver} · ${v.type}</div>
         </div>
+        ${washDotsHTML}
       </div>
-      <div class="wash-status ${full?'warn':'ok'}">${full?'⛔ وصل الحد الأقصى للشهر دا':'✅ متاح '+( 2-count)+' غسلة'}</div>`;
+      ${washHistHTML}
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
+        <div class="wash-status ${full?'warn':'ok'}">${full?'⛔ الحد الأقصى':'✅ متاح '+(2-count)+' غسلة'}</div>
+        ${!full?`<button onclick="addWash('${v.id}')" style="background:var(--accent2);color:#000;border:none;border-radius:10px;font-family:Cairo,sans-serif;font-size:.76rem;font-weight:700;padding:6px 14px;cursor:pointer;">+ تسجيل غسيل</button>`:''}
+      </div>`;
     list.appendChild(card);
   });
   document.getElementById('wash-done').textContent=done;
