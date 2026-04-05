@@ -481,9 +481,11 @@ function showLoading(v){document.getElementById('loading').style.display=v?'flex
 const iCol=()=>collection(db,'users',currentUser.uid,'invoices');
 const vCol=()=>collection(db,'users',currentUser.uid,'vehicles');
 const oCol=()=>collection(db,'users',currentUser.uid,'octane');
+const wCol=()=>collection(db,'users',currentUser.uid,'washing');
 const iDoc=id=>doc(db,'users',currentUser.uid,'invoices',id);
 const vDoc=id=>doc(db,'users',currentUser.uid,'vehicles',id);
 const oDoc=id=>doc(db,'users',currentUser.uid,'octane',id);
+const wDoc=id=>doc(db,'users',currentUser.uid,'washing',id);
 
 // ── AUTH ──
 onAuthStateChanged(auth,user=>{
@@ -507,8 +509,8 @@ function startListening(){
   unsubs.push(onSnapshot(query(iCol(),orderBy('createdAt','desc')),snap=>{invoices=snap.docs.map(d=>({id:d.id,...d.data()}));renderInvoices();populateMonthSelect();updateNamesList();}));
   unsubs.push(onSnapshot(query(vCol(),orderBy('createdAt','asc')),snap=>{vehicles=snap.docs.map(d=>({id:d.id,...d.data()}));renderVehicles();renderWashing();}));
   unsubs.push(onSnapshot(query(oCol(),orderBy('date','desc')),snap=>{octaneLogs=snap.docs.map(d=>({id:d.id,...d.data()}));renderOctane();}));
+  unsubs.push(onSnapshot(query(wCol(),orderBy('date','desc')),snap=>{washLogs=snap.docs.map(d=>({id:d.id,...d.data()}));renderWashing();}));
 }
-
 window.switchLoginTab=(tab,el)=>{
   document.querySelectorAll('.login-tab').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
@@ -866,18 +868,6 @@ function renderVehicles(){
 
 // ── WASHING ──
 let washLogs=[];
-function wCol(){return collection(db,'users',currentUser.uid,'washing');}
-function wDoc(id){return doc(db,'users',currentUser.uid,'washing',id);}
-
-// add washing listener to startListening
-const _origStart=startListening;
-function startListening(){
-  unsubs.forEach(u=>u());unsubs=[];
-  unsubs.push(onSnapshot(query(iCol(),orderBy('createdAt','desc')),snap=>{invoices=snap.docs.map(d=>({id:d.id,...d.data()}));renderInvoices();populateMonthSelect();updateNamesList();}));
-  unsubs.push(onSnapshot(query(vCol(),orderBy('createdAt','asc')),snap=>{vehicles=snap.docs.map(d=>({id:d.id,...d.data()}));renderVehicles();renderWashing();}));
-  unsubs.push(onSnapshot(query(oCol(),orderBy('date','desc')),snap=>{octaneLogs=snap.docs.map(d=>({id:d.id,...d.data()}));renderOctane();}));
-  unsubs.push(onSnapshot(query(wCol(),orderBy('date','desc')),snap=>{washLogs=snap.docs.map(d=>({id:d.id,...d.data()}));renderWashing();}));
-}
 
 window.addWash=async(vehicleId)=>{
   const tm=thisMonth();
