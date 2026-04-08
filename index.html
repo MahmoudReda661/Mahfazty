@@ -265,7 +265,9 @@ main{padding:16px;max-width:480px;margin:auto;padding-bottom:30px;}
     <button class="top-nav-btn" onclick="switchPage('vehicles',this)">🚗 العربيات</button>
     <button class="top-nav-btn" onclick="switchPage('washing',this)">🚿 الغسيل</button>
     <button class="top-nav-btn" onclick="switchPage('octane',this)">⛽ أوكتين</button>
+    <button class="top-nav-btn" onclick="switchPage('search',this)">🔍 بحث</button>
     <button class="top-nav-btn" onclick="switchPage('stats',this)">📊 إحصائيات</button>
+    <button class="top-nav-btn" onclick="switchPage('about',this)">ℹ️ عن البرنامج</button>
   </div>
 
   <main>
@@ -371,8 +373,31 @@ main{padding:16px;max-width:480px;margin:auto;padding-bottom:30px;}
         <div class="week-row"><span class="wk-label">الإجمالي</span><span id="wk-total" style="font-weight:900;color:var(--accent)">0 ج</span></div>
       </div>
 
+      <div class="section-title">تنبيه الرصيد</div>
+      <div style="background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:14px;margin-bottom:14px;">
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:10px;">لما رصيد يانسن أو انجلندر يوصل للحد ده هيظهرلك تنبيه</div>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
+          <span style="font-size:.8rem;color:var(--accent4);font-weight:700;width:70px;">يانسن</span>
+          <input class="charge-input" type="number" id="alert-y" placeholder="الحد (جنيه)" inputmode="numeric" style="flex:1;">
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;">
+          <span style="font-size:.8rem;color:var(--purple);font-weight:700;width:70px;">انجلندر</span>
+          <input class="charge-input" type="number" id="alert-e" placeholder="الحد (جنيه)" inputmode="numeric" style="flex:1;">
+        </div>
+        <button onclick="saveOctaneAlerts()" style="width:100%;padding:10px;background:linear-gradient(135deg,var(--accent),#d97706);border:none;border-radius:12px;color:#000;font-family:Cairo,sans-serif;font-size:.85rem;font-weight:900;cursor:pointer;">💾 حفظ الحدود</button>
+      </div>
+
+      <div id="octane-alert-banner" style="display:none;background:rgba(239,68,68,.15);border:1.5px solid var(--accent3);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:.82rem;color:var(--accent3);font-weight:700;"></div>
+
       <div class="section-title">سجل الشحن</div>
       <div id="octane-log"></div>
+    </div>
+
+    <!-- ══ SEARCH PAGE ══ -->
+    <div class="page" id="page-search">
+      <div class="section-title">بحث في الفواتير</div>
+      <input class="search-box" type="text" id="global-search" placeholder="🔍 ابحث بالاسم أو المبلغ أو الملاحظات..." oninput="renderGlobalSearch()">
+      <div id="search-results"></div>
     </div>
 
     <!-- ══ STATS PAGE ══ -->
@@ -383,8 +408,53 @@ main{padding:16px;max-width:480px;margin:auto;padding-bottom:30px;}
         <div class="dash-card c-b"><div class="lbl">متوسط الفاتورة</div><div class="val" id="s-avg">0</div><div class="sub">جنيه</div></div>
         <div class="dash-card c-g full"><div class="lbl">أكبر فاتورة</div><div class="val" id="s-max">0</div><div class="sub" id="s-max-name"></div></div>
       </div>
+      <div class="section-title">تقارير واتساب</div>
+      <div style="display:flex;gap:8px;margin-bottom:14px;">
+        <button onclick="generateReport('week')" style="flex:1;padding:12px;background:rgba(16,185,129,.15);border:1.5px solid var(--accent2);border-radius:12px;color:var(--accent2);font-family:Cairo,sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;">📋 تقرير أسبوعي</button>
+        <button onclick="generateReport('month')" style="flex:1;padding:12px;background:rgba(245,158,11,.15);border:1.5px solid var(--accent);border-radius:12px;color:var(--accent);font-family:Cairo,sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;">📊 تقرير شهري</button>
+      </div>
+      <textarea id="report-output" style="display:none;width:100%;background:var(--card2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:Cairo,sans-serif;font-size:.8rem;padding:12px;height:200px;resize:none;margin-bottom:10px;outline:none;"></textarea>
       <div class="section-title">أكتر الناس فواتير</div>
       <div id="top-people" style="margin-bottom:20px;"></div>
+    </div>
+
+    <!-- ══ ABOUT PAGE ══ -->
+    <div class="page" id="page-about">
+      <div style="text-align:center;padding:30px 0 20px;">
+        <div style="font-size:4rem;margin-bottom:8px;">💼</div>
+        <div style="font-size:1.8rem;font-weight:900;color:var(--accent);margin-bottom:4px;">محفظتي</div>
+        <div style="display:inline-block;background:rgba(245,158,11,.15);border:1px solid var(--accent);color:var(--accent);font-size:.75rem;font-weight:700;padding:3px 12px;border-radius:99px;margin-bottom:20px;">الإصدار V 0.8</div>
+      </div>
+      <div style="background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:18px;margin-bottom:12px;">
+        <div style="font-size:.75rem;color:var(--muted);font-weight:700;margin-bottom:12px;letter-spacing:.5px;">عن البرنامج</div>
+        <div style="font-size:.88rem;line-height:1.8;color:var(--text);">محفظتي هو نظام متكامل لإدارة الفواتير والمدفوعات، مصمم خصيصاً لتتبع الفواتير الواردة وتسجيل المصروفات والتسليمات، مع إدارة شاملة للعربيات وغسيلها وشحن أوكتين.</div>
+      </div>
+      <div style="background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:18px;margin-bottom:12px;">
+        <div style="font-size:.75rem;color:var(--muted);font-weight:700;margin-bottom:12px;">المطوّر</div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#d97706);display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:900;color:#000;">م</div>
+          <div>
+            <div style="font-weight:900;font-size:1rem;">Mahmoud Reda</div>
+            <div style="font-size:.75rem;color:var(--muted);margin-top:2px;">مطوّر البرنامج</div>
+          </div>
+        </div>
+      </div>
+      <div style="background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:18px;margin-bottom:12px;">
+        <div style="font-size:.75rem;color:var(--muted);font-weight:700;margin-bottom:10px;">المميزات</div>
+        ${['🧾 إدارة الفواتير والمدفوعات','👥 تتبع الموردين والأشخاص','🚗 إدارة العربيات والسواقين','🚿 متابعة غسيل العربيات','⛽ تتبع شحن أوكتين يومياً','📊 إحصائيات وتقارير شهرية وأسبوعية','🔍 بحث سريع في الفواتير','☁️ حفظ على السحابة Firebase'].map(f=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:.82rem;">${f}</div>`).join('')}
+      </div>
+      <div style="background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:18px;margin-bottom:12px;">
+        <div style="font-size:.75rem;color:var(--muted);font-weight:700;margin-bottom:10px;">سجل الإصدارات</div>
+        ${[
+          ['V 0.8','تنبيه أوكتين + بحث سريع + تقارير + عن البرنامج'],
+          ['V 0.7','العربيات + الغسيل + أوكتين + صرف جماعي محسّن'],
+          ['V 0.6','Firebase + تسجيل دخول + حسابات متعددة'],
+          ['V 0.5','صفحة الأشخاص + تصفح الشهور'],
+          ['V 0.4','ضغط الصور + نسخ احتياطي'],
+          ['V 0.1','الإصدار الأول — الفواتير الأساسية'],
+        ].map(([v,d])=>`<div style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:.8rem;"><span style="color:var(--accent);font-weight:700;min-width:40px;">${v}</span><span style="color:var(--muted);">${d}</span></div>`).join('')}
+      </div>
+      <div style="text-align:center;color:var(--muted);font-size:.75rem;padding:16px 0 40px;">جميع الحقوق محفوظة © 2025 Mahmoud Reda</div>
     </div>
 
   </main>
@@ -980,6 +1050,7 @@ function renderOctane(){
   const eTotal=octaneLogs.reduce((s,l)=>s+(l.englander||0),0);
   document.getElementById('oct-y-bal').textContent=fmt(yTotal);
   document.getElementById('oct-e-bal').textContent=fmt(eTotal);
+  checkOctaneAlerts(yTotal,eTotal);
 
   // this week
   const ws=weekStart();
@@ -1044,6 +1115,121 @@ function updateStats(){
   const sorted=Object.entries(people).sort((a,b)=>b[1].total-a[1].total).slice(0,5);
   document.getElementById('top-people').innerHTML=sorted.map(([n,d])=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:11px 14px;background:var(--card);border-radius:12px;margin-bottom:8px;border:1px solid var(--border);"><div><div style="font-weight:700;font-size:.88rem">${n}</div><div style="font-size:.68rem;color:var(--muted)">${d.count} فاتورة</div></div><div style="font-weight:900;color:var(--accent)">${fmt(d.total)} ج</div></div>`).join('');
 }
+
+// ── OCTANE ALERTS ──
+let octaneAlerts={yanssen:0,englander:0};
+async function loadOctaneAlerts(){
+  try{
+    const d=await getDoc(doc(db,'users',currentUser.uid,'settings','octaneAlerts'));
+    if(d.exists()){
+      octaneAlerts=d.data();
+      document.getElementById('alert-y').value=octaneAlerts.yanssen||'';
+      document.getElementById('alert-e').value=octaneAlerts.englander||'';
+    }
+  }catch(e){}
+}
+window.saveOctaneAlerts=async()=>{
+  const y=parseFloat(document.getElementById('alert-y').value)||0;
+  const e=parseFloat(document.getElementById('alert-e').value)||0;
+  octaneAlerts={yanssen:y,englander:e};
+  await setDoc(doc(db,'users',currentUser.uid,'settings','octaneAlerts'),octaneAlerts);
+  showToast('✅ تم حفظ حدود التنبيه');
+  renderOctane();
+};
+function checkOctaneAlerts(yTotal,eTotal){
+  const banner=document.getElementById('octane-alert-banner');
+  if(!banner)return;
+  const msgs=[];
+  if(octaneAlerts.yanssen>0&&yTotal<=octaneAlerts.yanssen)
+    msgs.push(`⚠️ رصيد يانسن وصل لـ ${fmt(yTotal)} ج — أقل من الحد المحدد ${fmt(octaneAlerts.yanssen)} ج`);
+  if(octaneAlerts.englander>0&&eTotal<=octaneAlerts.englander)
+    msgs.push(`⚠️ رصيد انجلندر وصل لـ ${fmt(eTotal)} ج — أقل من الحد المحدد ${fmt(octaneAlerts.englander)} ج`);
+  if(msgs.length){banner.style.display='block';banner.innerHTML=msgs.join('<br>');}
+  else banner.style.display='none';
+}
+
+// ── GLOBAL SEARCH ──
+window.renderGlobalSearch=()=>{
+  const q=(document.getElementById('global-search')?.value||'').trim().toLowerCase();
+  const res=document.getElementById('search-results');
+  if(!q){res.innerHTML='<div class="empty"><div class="big">🔍</div>ابدأ الكتابة للبحث</div>';return;}
+  const results=invoices.filter(i=>
+    i.name.toLowerCase().includes(q)||
+    String(i.amount).includes(q)||
+    (i.note&&i.note.toLowerCase().includes(q))
+  );
+  res.innerHTML='';
+  if(!results.length){res.innerHTML='<div class="empty"><div class="big">😶</div>ملقتش نتائج</div>';return;}
+  const countEl=document.createElement('div');
+  countEl.style.cssText='font-size:.76rem;color:var(--muted);margin-bottom:10px;';
+  countEl.textContent=`${results.length} نتيجة`;
+  res.appendChild(countEl);
+  const list=document.createElement('div');list.className='inv-list';
+  results.forEach(i=>renderInvCard(i,list));
+  res.appendChild(list);
+};
+
+// ── REPORTS ──
+window.generateReport=(period)=>{
+  const now=new Date();
+  let items,title,dateRange;
+  if(period==='week'){
+    const ws=weekStart();
+    items=invoices.filter(i=>i.createdAt.slice(0,10)>=ws);
+    title='التقرير الأسبوعي';
+    dateRange=`من ${new Date(ws).toLocaleDateString('ar-EG',{day:'numeric',month:'long'})} إلى ${now.toLocaleDateString('ar-EG',{day:'numeric',month:'long',year:'numeric'})}`;
+  } else {
+    const mk=`${now.getFullYear()}-${now.getMonth()+1}`;
+    items=invoices.filter(i=>monthKey(i.createdAt)===mk);
+    title='التقرير الشهري';
+    dateRange=now.toLocaleDateString('ar-EG',{month:'long',year:'numeric'});
+  }
+  const total=items.reduce((s,i)=>s+i.amount,0);
+  const spent=items.reduce((s,i)=>s+i.spent,0);
+  const delivered=items.filter(i=>i.delivered).reduce((s,i)=>s+i.amount,0);
+  const pending=items.filter(i=>!i.delivered).reduce((s,i)=>s+i.amount,0);
+  const people={};items.forEach(i=>{if(!people[i.name])people[i.name]={count:0,total:0};people[i.name].count++;people[i.name].total+=i.amount;});
+
+  let txt=`📊 *${title}*\n`;
+  txt+=`📅 ${dateRange}\n`;
+  txt+=`${'─'.repeat(30)}\n\n`;
+  txt+=`💰 إجمالي المستلم: *${fmt(total)} ج*\n`;
+  txt+=`🛒 إجمالي المصروف: *${fmt(spent)} ج*\n`;
+  txt+=`✅ تم تسليمه: *${fmt(delivered)} ج*\n`;
+  txt+=`⏳ قيد التسليم: *${fmt(pending)} ج*\n`;
+  txt+=`📋 عدد الفواتير: *${items.length}*\n\n`;
+  txt+=`${'─'.repeat(30)}\n`;
+  txt+=`👥 *تفاصيل الموردين:*\n`;
+  Object.entries(people).sort((a,b)=>b[1].total-a[1].total).forEach(([n,d])=>{
+    txt+=`• ${n}: ${d.count} فاتورة — ${fmt(d.total)} ج\n`;
+  });
+  txt+=`\n${'─'.repeat(30)}\n`;
+  txt+=`محفظتي V0.8 — Mahmoud Reda`;
+
+  // copy to clipboard
+  navigator.clipboard.writeText(txt).then(()=>{
+    showToast('✅ تم نسخ التقرير — افتح واتساب والصقه!');
+  }).catch(()=>{
+    // fallback: show in textarea
+    const ta=document.getElementById('report-output');
+    ta.value=txt;ta.style.display='block';ta.select();
+    showToast('اضغط نسخ من الحقل 👆');
+  });
+};
+
+// ── SWITCH PAGE ──
+window.switchPage=(name,btn)=>{
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.top-nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  btn.classList.add('active');
+  if(name==='people')renderPeople();
+  if(name==='history'){populateMonthSelect();renderHistory();}
+  if(name==='stats')updateStats();
+  if(name==='washing')renderWashing();
+  if(name==='octane'){loadOctaneAlerts();renderOctane();}
+  if(name==='search'){document.getElementById('global-search').value='';document.getElementById('search-results').innerHTML='<div class="empty"><div class="big">🔍</div>ابدأ الكتابة للبحث</div>';}
+};
 </script>
 </body>
 </html>
