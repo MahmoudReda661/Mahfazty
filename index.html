@@ -254,7 +254,10 @@ main{padding:16px;max-width:480px;margin:auto;padding-bottom:30px;}
 <div id="app-page">
   <div class="topbar">
     <h1>💼 محفظتي</h1>
-    <button class="btn-logout" onclick="doLogout()">خروج 👋</button>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div id="topbar-user" style="font-size:.72rem;color:var(--muted);text-align:left;"></div>
+      <button class="btn-logout" onclick="doLogout()">خروج 👋</button>
+    </div>
   </div>
 
   <!-- TOP NAV -->
@@ -504,20 +507,14 @@ main{padding:16px;max-width:480px;margin:auto;padding-bottom:30px;}
         <div class="field"><label>كلمة المرور</label><input type="password" id="new-user-pass" placeholder="6 حروف على الأقل"></div>
         <div class="field">
           <label>الدور</label>
-          <select id="new-user-role">
+          <select id="new-user-role" onchange="toggleNewPerms()">
             <option value="manager">👔 مدير — يشوف كل حاجة بدون حذف</option>
             <option value="employee">👷 موظف — يشوف أقسام محددة بس</option>
           </select>
         </div>
-        <div id="new-user-permissions" style="display:none;margin-top:10px;">
-          <div style="font-size:.75rem;color:var(--muted);font-weight:700;margin-bottom:8px;">الأقسام المسموح بيها:</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-            ${[['invoices','🧾 الفواتير'],['people','👥 الأشخاص'],['history','📅 الشهور'],['vehicles','🚗 العربيات'],['washing','🚿 الغسيل'],['octane','⛽ أوكتين'],['search','🔍 بحث'],['stats','📊 إحصائيات']].map(([k,l])=>`
-            <label style="display:flex;align-items:center;gap:8px;background:var(--card2);border-radius:10px;padding:9px 10px;cursor:pointer;font-size:.78rem;">
-              <input type="checkbox" class="perm-check" data-perm="${k}" style="width:16px;height:16px;accent-color:var(--accent);cursor:pointer;">
-              ${l}
-            </label>`).join('')}
-          </div>
+        <div id="new-user-permissions" style="display:none;margin-top:12px;">
+          <div style="font-size:.75rem;color:var(--muted);font-weight:700;margin-bottom:10px;">الأقسام المسموح بيها:</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;" id="new-perms-grid"></div>
         </div>
         <button onclick="createUser()" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),#d97706);border:none;border-radius:12px;color:#000;font-family:Cairo,sans-serif;font-size:.88rem;font-weight:900;cursor:pointer;margin-top:12px;">➕ إضافة المستخدم</button>
         <div id="new-user-err" style="color:var(--accent3);font-size:.78rem;text-align:center;margin-top:8px;min-height:18px;"></div>
@@ -542,15 +539,9 @@ main{padding:16px;max-width:480px;margin:auto;padding-bottom:30px;}
         <option value="employee">👷 موظف — يشوف أقسام محددة</option>
       </select>
     </div>
-    <div id="edit-permissions" style="display:none;margin-top:10px;">
-      <div style="font-size:.75rem;color:var(--muted);font-weight:700;margin-bottom:8px;">الأقسام المسموح بيها:</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-        ${[['invoices','🧾 الفواتير'],['people','👥 الأشخاص'],['history','📅 الشهور'],['vehicles','🚗 العربيات'],['washing','🚿 الغسيل'],['octane','⛽ أوكتين'],['search','🔍 بحث'],['stats','📊 إحصائيات']].map(([k,l])=>`
-        <label style="display:flex;align-items:center;gap:8px;background:var(--card2);border-radius:10px;padding:9px 10px;cursor:pointer;font-size:.78rem;">
-          <input type="checkbox" class="edit-perm-check" data-perm="${k}" style="width:16px;height:16px;accent-color:var(--accent);cursor:pointer;">
-          ${l}
-        </label>`).join('')}
-      </div>
+    <div id="edit-permissions" style="display:none;margin-top:12px;">
+      <div style="font-size:.75rem;color:var(--muted);font-weight:700;margin-bottom:10px;">الأقسام المسموح بيها:</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;" id="edit-perms-grid"></div>
     </div>
     <button class="btn-save" style="margin-top:14px;" onclick="saveUserPerms()">💾 حفظ الصلاحيات</button>
   </div>
@@ -1330,11 +1321,61 @@ window.generateReport=(period)=>{
 };
 
 // ── PERMISSIONS ──
-const ALL_PAGES=['invoices','people','history','vehicles','washing','octane','search','stats'];
+const PAGES_LIST=[
+  ['invoices','🧾','الفواتير'],
+  ['people','👥','الأشخاص'],
+  ['history','📅','الشهور'],
+  ['vehicles','🚗','العربيات'],
+  ['washing','🚿','الغسيل'],
+  ['octane','⛽','أوكتين'],
+  ['search','🔍','بحث'],
+  ['stats','📊','إحصائيات'],
+];
+
+function buildPermGrid(containerId, checkClass, selectedPerms=[]){
+  const grid=document.getElementById(containerId);
+  if(!grid)return;
+  grid.innerHTML='';
+  PAGES_LIST.forEach(([k,icon,label])=>{
+    const lbl=document.createElement('label');
+    lbl.style.cssText='display:flex;align-items:center;gap:8px;background:var(--card2);border-radius:10px;padding:10px 12px;cursor:pointer;font-size:.8rem;border:1.5px solid var(--border);transition:border-color .15s;';
+    lbl.innerHTML=`<input type="checkbox" class="${checkClass}" data-perm="${k}" style="width:16px;height:16px;accent-color:var(--accent);cursor:pointer;" ${selectedPerms.includes(k)?'checked':''}> ${icon} ${label}`;
+    lbl.querySelector('input').addEventListener('change',function(){
+      lbl.style.borderColor=this.checked?'var(--accent)':'var(--border)';
+    });
+    if(selectedPerms.includes(k)) lbl.style.borderColor='var(--accent)';
+    grid.appendChild(lbl);
+  });
+}
+
+window.toggleNewPerms=()=>{
+  const r=document.getElementById('new-user-role').value;
+  const el=document.getElementById('new-user-permissions');
+  el.style.display=r==='employee'?'block':'none';
+  if(r==='employee') buildPermGrid('new-perms-grid','perm-check',[]);
+};
 
 function applyPermissions(){
   const isAdmin=currentRole==='admin';
   const isManager=currentRole==='manager';
+
+  // show username in topbar
+  const topbarUser=document.getElementById('topbar-user');
+  if(topbarUser&&currentUser){
+    const name=currentUser.displayName||currentUser.email.split('@')[0];
+    const roleLabel=isAdmin?'👑 Admin':isManager?'👔 مدير':'👷 موظف';
+    topbarUser.innerHTML=`<div style="font-weight:700;color:var(--text);font-size:.78rem;">${name}</div><div style="color:var(--muted);font-size:.65rem;">${roleLabel}</div>`;
+  }
+
+  // hide register tab — only login allowed
+  const loginTabs=document.querySelector('.login-tabs');
+  if(loginTabs) loginTabs.style.display='none';
+  // make sure login form is always shown
+  const lf=document.getElementById('login-form');
+  if(lf) lf.style.display='block';
+  const rf=document.getElementById('register-form');
+  if(rf) rf.style.display='none';
+
   // show/hide users nav (admin only)
   const navUsers=document.getElementById('nav-users');
   if(navUsers) navUsers.style.display=isAdmin?'':'none';
@@ -1347,7 +1388,6 @@ function applyPermissions(){
     const page=match[1];
     if(page==='about'||page==='users'){btn.style.display='';return;}
     if(isAdmin||isManager){btn.style.display='';return;}
-    // employee: show only allowed pages
     btn.style.display=currentPerms.includes(page)?'':'none';
   });
 }
@@ -1358,14 +1398,22 @@ function canAccess(page){
 }
 
 // ── USERS MANAGEMENT ──
-document.getElementById('new-user-role')?.addEventListener('change',function(){
-  document.getElementById('new-user-permissions').style.display=this.value==='employee'?'block':'none';
-});
 
-function toggleEditPerms(){
+window.toggleEditPerms=()=>{
   const r=document.getElementById('edit-role').value;
-  document.getElementById('edit-permissions').style.display=r==='employee'?'block':'none';
-}
+  const el=document.getElementById('edit-permissions');
+  el.style.display=r==='employee'?'block':'none';
+};
+
+window.openPermsModal=(uid,name,role,perms)=>{
+  editingUserId=uid;
+  document.getElementById('perms-modal-title').textContent=`✏️ صلاحيات ${name}`;
+  document.getElementById('edit-role').value=role;
+  const showPerms=role==='employee';
+  document.getElementById('edit-permissions').style.display=showPerms?'block':'none';
+  buildPermGrid('edit-perms-grid','edit-perm-check',perms);
+  document.getElementById('perms-overlay').classList.add('show');
+};
 
 window.createUser=async()=>{
   const email=document.getElementById('new-user-email').value.trim();
@@ -1444,14 +1492,6 @@ async function renderUsersList(){
   }catch(e){list.innerHTML='<div class="empty"><div class="big">⚠️</div>حصل خطأ في التحميل</div>';}
 }
 
-window.openPermsModal=(uid,name,role,perms)=>{
-  editingUserId=uid;
-  document.getElementById('perms-modal-title').textContent=`✏️ صلاحيات ${name}`;
-  document.getElementById('edit-role').value=role;
-  document.getElementById('edit-permissions').style.display=role==='employee'?'block':'none';
-  document.querySelectorAll('.edit-perm-check').forEach(cb=>{cb.checked=perms.includes(cb.dataset.perm);});
-  document.getElementById('perms-overlay').classList.add('show');
-};
 window.closePermsModal=()=>document.getElementById('perms-overlay').classList.remove('show');
 
 window.saveUserPerms=async()=>{
