@@ -390,6 +390,12 @@ main{padding:16px;max-width:480px;margin:auto;padding-bottom:30px;}
   </main>
 </div>
 
+<!-- PHOTO VIEWER -->
+<div id="photo-viewer" onclick="closePhotoViewer()" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.95);align-items:center;justify-content:center;flex-direction:column;gap:16px;">
+  <img id="photo-viewer-img" style="max-width:96vw;max-height:85vh;border-radius:12px;object-fit:contain;">
+  <button onclick="closePhotoViewer()" style="background:rgba(255,255,255,.15);border:none;color:#fff;font-family:Cairo,sans-serif;font-size:.85rem;font-weight:700;padding:8px 24px;border-radius:99px;cursor:pointer;">✕ إغلاق</button>
+</div>
+
 <!-- PERSON DETAIL -->
 <div class="pdetail-overlay" id="person-overlay" onclick="if(event.target===this)closePersonModal()">
   <div class="pdetail-modal">
@@ -582,7 +588,9 @@ function renderInvCard(inv,container){
   const card=document.createElement('div');
   card.className='inv-card';
   const date=new Date(inv.createdAt).toLocaleDateString('ar-EG',{day:'numeric',month:'short',year:'numeric'});
-  const thumb=inv.photo?`<div class="inv-thumb"><img src="${inv.photo}" alt=""></div>`:`<div class="inv-thumb">📄</div>`;
+  const thumb=inv.photo
+    ?`<div class="inv-thumb" onclick="viewPhoto('${inv.photo}')" style="cursor:zoom-in;"><img src="${inv.photo}" alt=""></div>`
+    :`<div class="inv-thumb">📄</div>`;
   card.innerHTML=`
     <div class="inv-head">${thumb}
       <div class="inv-info"><div class="inv-name">${inv.name}</div><div class="inv-date">${date}${inv.note?' · '+inv.note:''}</div></div>
@@ -600,6 +608,16 @@ function renderInvCard(inv,container){
     </div>`;
   container.appendChild(card);
 }
+
+// ── PHOTO VIEWER ──
+window.viewPhoto=src=>{
+  const v=document.getElementById('photo-viewer');
+  document.getElementById('photo-viewer-img').src=src;
+  v.style.display='flex';
+};
+window.closePhotoViewer=()=>{
+  document.getElementById('photo-viewer').style.display='none';
+};
 
 // ── INVOICE ACTIONS ──
 window.toggleStatus=async(id,field)=>{
