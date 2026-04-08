@@ -425,36 +425,70 @@ main{padding:16px;max-width:480px;margin:auto;padding-bottom:30px;}
         <div style="font-size:1.8rem;font-weight:900;color:var(--accent);margin-bottom:4px;">محفظتي</div>
         <div style="display:inline-block;background:rgba(245,158,11,.15);border:1px solid var(--accent);color:var(--accent);font-size:.75rem;font-weight:700;padding:3px 12px;border-radius:99px;margin-bottom:20px;">الإصدار V 0.8</div>
       </div>
+
       <div style="background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:18px;margin-bottom:12px;">
         <div style="font-size:.75rem;color:var(--muted);font-weight:700;margin-bottom:12px;letter-spacing:.5px;">عن البرنامج</div>
         <div style="font-size:.88rem;line-height:1.8;color:var(--text);">محفظتي هو نظام متكامل لإدارة الفواتير والمدفوعات، مصمم خصيصاً لتتبع الفواتير الواردة وتسجيل المصروفات والتسليمات، مع إدارة شاملة للعربيات وغسيلها وشحن أوكتين.</div>
       </div>
+
       <div style="background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:18px;margin-bottom:12px;">
         <div style="font-size:.75rem;color:var(--muted);font-weight:700;margin-bottom:12px;">المطوّر</div>
         <div style="display:flex;align-items:center;gap:12px;">
-          <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#d97706);display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:900;color:#000;">م</div>
+          <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#d97706);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:900;color:#000;flex-shrink:0;">م</div>
           <div>
             <div style="font-weight:900;font-size:1rem;">Mahmoud Reda</div>
             <div style="font-size:.75rem;color:var(--muted);margin-top:2px;">مطوّر البرنامج</div>
           </div>
         </div>
       </div>
+
       <div style="background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:18px;margin-bottom:12px;">
-        <div style="font-size:.75rem;color:var(--muted);font-weight:700;margin-bottom:10px;">المميزات</div>
-        ${['🧾 إدارة الفواتير والمدفوعات','👥 تتبع الموردين والأشخاص','🚗 إدارة العربيات والسواقين','🚿 متابعة غسيل العربيات','⛽ تتبع شحن أوكتين يومياً','📊 إحصائيات وتقارير شهرية وأسبوعية','🔍 بحث سريع في الفواتير','☁️ حفظ على السحابة Firebase'].map(f=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:.82rem;">${f}</div>`).join('')}
+        <div style="font-size:.75rem;color:var(--muted);font-weight:700;margin-bottom:14px;letter-spacing:.5px;">المميزات</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div style="background:var(--card2);border-radius:12px;padding:12px;text-align:center;">
+            <div style="font-size:1.6rem;margin-bottom:6px;">🧾</div>
+            <div style="font-size:.76rem;font-weight:700;color:var(--text);">إدارة الفواتير</div>
+            <div style="font-size:.65rem;color:var(--muted);margin-top:2px;">استلام وصرف وتسليم</div>
+          </div>
+          <div style="background:var(--card2);border-radius:12px;padding:12px;text-align:center;">
+            <div style="font-size:1.6rem;margin-bottom:6px;">👥</div>
+            <div style="font-size:.76rem;font-weight:700;color:var(--text);">تتبع الموردين</div>
+            <div style="font-size:.65rem;color:var(--muted);margin-top:2px;">إحصائيات لكل شخص</div>
+          </div>
+          <div style="background:var(--card2);border-radius:12px;padding:12px;text-align:center;">
+            <div style="font-size:1.6rem;margin-bottom:6px;">🚗</div>
+            <div style="font-size:.76rem;font-weight:700;color:var(--text);">إدارة العربيات</div>
+            <div style="font-size:.65rem;color:var(--muted);margin-top:2px;">سواقين وبيانات كاملة</div>
+          </div>
+          <div style="background:var(--card2);border-radius:12px;padding:12px;text-align:center;">
+            <div style="font-size:1.6rem;margin-bottom:6px;">🚿</div>
+            <div style="font-size:.76rem;font-weight:700;color:var(--text);">متابعة الغسيل</div>
+            <div style="font-size:.65rem;color:var(--muted);margin-top:2px;">حد أقصى 2 شهرياً</div>
+          </div>
+          <div style="background:var(--card2);border-radius:12px;padding:12px;text-align:center;">
+            <div style="font-size:1.6rem;margin-bottom:6px;">⛽</div>
+            <div style="font-size:.76rem;font-weight:700;color:var(--text);">شحن أوكتين</div>
+            <div style="font-size:.65rem;color:var(--muted);margin-top:2px;">يانسن وانجلندر يومياً</div>
+          </div>
+          <div style="background:var(--card2);border-radius:12px;padding:12px;text-align:center;">
+            <div style="font-size:1.6rem;margin-bottom:6px;">📊</div>
+            <div style="font-size:.76rem;font-weight:700;color:var(--text);">تقارير واتساب</div>
+            <div style="font-size:.65rem;color:var(--muted);margin-top:2px;">أسبوعي وشهري</div>
+          </div>
+          <div style="background:var(--card2);border-radius:12px;padding:12px;text-align:center;">
+            <div style="font-size:1.6rem;margin-bottom:6px;">🔍</div>
+            <div style="font-size:.76rem;font-weight:700;color:var(--text);">بحث سريع</div>
+            <div style="font-size:.65rem;color:var(--muted);margin-top:2px;">في كل الفواتير</div>
+          </div>
+          <div style="background:var(--card2);border-radius:12px;padding:12px;text-align:center;">
+            <div style="font-size:1.6rem;margin-bottom:6px;">☁️</div>
+            <div style="font-size:.76rem;font-weight:700;color:var(--text);">حفظ سحابي</div>
+            <div style="font-size:.65rem;color:var(--muted);margin-top:2px;">Firebase — آمن ومجاني</div>
+          </div>
+        </div>
       </div>
-      <div style="background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:18px;margin-bottom:12px;">
-        <div style="font-size:.75rem;color:var(--muted);font-weight:700;margin-bottom:10px;">سجل الإصدارات</div>
-        ${[
-          ['V 0.8','تنبيه أوكتين + بحث سريع + تقارير + عن البرنامج'],
-          ['V 0.7','العربيات + الغسيل + أوكتين + صرف جماعي محسّن'],
-          ['V 0.6','Firebase + تسجيل دخول + حسابات متعددة'],
-          ['V 0.5','صفحة الأشخاص + تصفح الشهور'],
-          ['V 0.4','ضغط الصور + نسخ احتياطي'],
-          ['V 0.1','الإصدار الأول — الفواتير الأساسية'],
-        ].map(([v,d])=>`<div style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:.8rem;"><span style="color:var(--accent);font-weight:700;min-width:40px;">${v}</span><span style="color:var(--muted);">${d}</span></div>`).join('')}
-      </div>
-      <div style="text-align:center;color:var(--muted);font-size:.75rem;padding:16px 0 40px;">جميع الحقوق محفوظة © 2025 Mahmoud Reda</div>
+
+      <div style="text-align:center;color:var(--muted);font-size:.75rem;padding:16px 0 40px;">جميع الحقوق محفوظة © 2026 Mahmoud Reda</div>
     </div>
 
   </main>
