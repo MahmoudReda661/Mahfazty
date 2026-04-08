@@ -267,6 +267,7 @@ main{padding:16px;max-width:480px;margin:auto;padding-bottom:30px;}
     <button class="top-nav-btn" onclick="switchPage('octane',this)">⛽ أوكتين</button>
     <button class="top-nav-btn" onclick="switchPage('search',this)">🔍 بحث</button>
     <button class="top-nav-btn" onclick="switchPage('stats',this)">📊 إحصائيات</button>
+    <button class="top-nav-btn" id="nav-users" style="display:none" onclick="switchPage('users',this)">👑 المستخدمين</button>
     <button class="top-nav-btn" onclick="switchPage('about',this)">ℹ️ عن البرنامج</button>
   </div>
 
@@ -423,7 +424,7 @@ main{padding:16px;max-width:480px;margin:auto;padding-bottom:30px;}
       <div style="text-align:center;padding:30px 0 20px;">
         <div style="font-size:4rem;margin-bottom:8px;">💼</div>
         <div style="font-size:1.8rem;font-weight:900;color:var(--accent);margin-bottom:4px;">محفظتي</div>
-        <div style="display:inline-block;background:rgba(245,158,11,.15);border:1px solid var(--accent);color:var(--accent);font-size:.75rem;font-weight:700;padding:3px 12px;border-radius:99px;margin-bottom:20px;">الإصدار V 0.8</div>
+        <div style="display:inline-block;background:rgba(245,158,11,.15);border:1px solid var(--accent);color:var(--accent);font-size:.75rem;font-weight:700;padding:3px 12px;border-radius:99px;margin-bottom:20px;">الإصدار V 0.9</div>
       </div>
 
       <div style="background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:18px;margin-bottom:12px;">
@@ -491,7 +492,68 @@ main{padding:16px;max-width:480px;margin:auto;padding-bottom:30px;}
       <div style="text-align:center;color:var(--muted);font-size:.75rem;padding:16px 0 40px;">جميع الحقوق محفوظة © 2026 Mahmoud Reda</div>
     </div>
 
+    <!-- ══ USERS PAGE ══ -->
+    <div class="page" id="page-users">
+      <div class="section-title">إدارة المستخدمين</div>
+      <div id="current-user-role" style="margin-bottom:14px;"></div>
+
+      <div style="background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:16px;margin-bottom:14px;">
+        <div style="font-size:.75rem;color:var(--muted);font-weight:700;margin-bottom:12px;">➕ إضافة مستخدم جديد</div>
+        <div class="field"><label>الإيميل</label><input type="email" id="new-user-email" placeholder="example@email.com"></div>
+        <div class="field"><label>الاسم</label><input type="text" id="new-user-name" placeholder="اسم المستخدم"></div>
+        <div class="field"><label>كلمة المرور</label><input type="password" id="new-user-pass" placeholder="6 حروف على الأقل"></div>
+        <div class="field">
+          <label>الدور</label>
+          <select id="new-user-role">
+            <option value="manager">👔 مدير — يشوف كل حاجة بدون حذف</option>
+            <option value="employee">👷 موظف — يشوف أقسام محددة بس</option>
+          </select>
+        </div>
+        <div id="new-user-permissions" style="display:none;margin-top:10px;">
+          <div style="font-size:.75rem;color:var(--muted);font-weight:700;margin-bottom:8px;">الأقسام المسموح بيها:</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            ${[['invoices','🧾 الفواتير'],['people','👥 الأشخاص'],['history','📅 الشهور'],['vehicles','🚗 العربيات'],['washing','🚿 الغسيل'],['octane','⛽ أوكتين'],['search','🔍 بحث'],['stats','📊 إحصائيات']].map(([k,l])=>`
+            <label style="display:flex;align-items:center;gap:8px;background:var(--card2);border-radius:10px;padding:9px 10px;cursor:pointer;font-size:.78rem;">
+              <input type="checkbox" class="perm-check" data-perm="${k}" style="width:16px;height:16px;accent-color:var(--accent);cursor:pointer;">
+              ${l}
+            </label>`).join('')}
+          </div>
+        </div>
+        <button onclick="createUser()" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),#d97706);border:none;border-radius:12px;color:#000;font-family:Cairo,sans-serif;font-size:.88rem;font-weight:900;cursor:pointer;margin-top:12px;">➕ إضافة المستخدم</button>
+        <div id="new-user-err" style="color:var(--accent3);font-size:.78rem;text-align:center;margin-top:8px;min-height:18px;"></div>
+      </div>
+
+      <div class="section-title">المستخدمين الحاليين</div>
+      <div id="users-list"></div>
+    </div>
+
   </main>
+</div>
+
+<!-- EDIT PERMISSIONS MODAL -->
+<div class="overlay" id="perms-overlay" onclick="if(event.target===this)closePermsModal()">
+  <div class="modal">
+    <button class="modal-close" onclick="closePermsModal()">✕</button>
+    <div class="modal-title" id="perms-modal-title">تعديل الصلاحيات</div>
+    <div class="field">
+      <label>الدور</label>
+      <select id="edit-role" onchange="toggleEditPerms()">
+        <option value="manager">👔 مدير — يشوف كل حاجة بدون حذف</option>
+        <option value="employee">👷 موظف — يشوف أقسام محددة</option>
+      </select>
+    </div>
+    <div id="edit-permissions" style="display:none;margin-top:10px;">
+      <div style="font-size:.75rem;color:var(--muted);font-weight:700;margin-bottom:8px;">الأقسام المسموح بيها:</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        ${[['invoices','🧾 الفواتير'],['people','👥 الأشخاص'],['history','📅 الشهور'],['vehicles','🚗 العربيات'],['washing','🚿 الغسيل'],['octane','⛽ أوكتين'],['search','🔍 بحث'],['stats','📊 إحصائيات']].map(([k,l])=>`
+        <label style="display:flex;align-items:center;gap:8px;background:var(--card2);border-radius:10px;padding:9px 10px;cursor:pointer;font-size:.78rem;">
+          <input type="checkbox" class="edit-perm-check" data-perm="${k}" style="width:16px;height:16px;accent-color:var(--accent);cursor:pointer;">
+          ${l}
+        </label>`).join('')}
+      </div>
+    </div>
+    <button class="btn-save" style="margin-top:14px;" onclick="saveUserPerms()">💾 حفظ الصلاحيات</button>
+  </div>
 </div>
 
 <!-- PHOTO VIEWER -->
@@ -562,7 +624,7 @@ main{padding:16px;max-width:480px;margin:auto;padding-bottom:30px;}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-import { getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy, writeBatch, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy, writeBatch, setDoc, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB8Q-a3VMbl4ok9-kM5MVgPC7RvPN9czbw",
@@ -597,11 +659,28 @@ const vDoc=id=>doc(db,'users',currentUser.uid,'vehicles',id);
 const oDoc=id=>doc(db,'users',currentUser.uid,'octane',id);
 const wDoc=id=>doc(db,'users',currentUser.uid,'washing',id);
 
+let currentRole='admin';
+let currentPerms=[];
+let editingUserId=null;
+
 // ── AUTH ──
-onAuthStateChanged(auth,user=>{
+onAuthStateChanged(auth,async user=>{
   showLoading(false);
   if(user){
     currentUser=user;
+    // load role
+    try{
+      const roleDoc=await getDoc(doc(db,'users',user.uid,'settings','role'));
+      if(roleDoc.exists()){
+        currentRole=roleDoc.data().role||'admin';
+        currentPerms=roleDoc.data().permissions||[];
+      } else {
+        // first user = admin
+        currentRole='admin';
+        await setDoc(doc(db,'users',user.uid,'settings','role'),{role:'admin',permissions:[],name:user.displayName||'',email:user.email,uid:user.uid});
+      }
+    }catch(e){currentRole='admin';}
+    applyPermissions();
     document.getElementById('login-page').style.display='none';
     document.getElementById('app-page').style.display='block';
     startListening();
@@ -707,8 +786,7 @@ function renderInvCard(inv,container){
     </div>
     ${!inv.spentDone?`<div class="spent-row"><input type="number" placeholder="المبلغ المصروف" inputmode="numeric" id="si-${inv.id}"><button onclick="logSpent('${inv.id}')">تسجيل</button></div>`:''}
     <div class="inv-acts">
-      <button class="btn-sm btn-edit" onclick="openInvModal('${inv.id}')">✏️ تعديل</button>
-      <button class="btn-sm btn-del" onclick="deleteInv('${inv.id}')">🗑 حذف</button>
+      ${currentRole==='admin'?`<button class="btn-sm btn-edit" onclick="openInvModal('${inv.id}')">✏️ تعديل</button><button class="btn-sm btn-del" onclick="deleteInv('${inv.id}')">🗑 حذف</button>`:`<div style="font-size:.7rem;color:var(--muted);padding:4px 0;">👁 عرض فقط</div>`}
     </div>`;
   container.appendChild(card);
 }
@@ -1251,8 +1329,155 @@ window.generateReport=(period)=>{
   });
 };
 
+// ── PERMISSIONS ──
+const ALL_PAGES=['invoices','people','history','vehicles','washing','octane','search','stats'];
+
+function applyPermissions(){
+  const isAdmin=currentRole==='admin';
+  const isManager=currentRole==='manager';
+  // show/hide users nav (admin only)
+  const navUsers=document.getElementById('nav-users');
+  if(navUsers) navUsers.style.display=isAdmin?'':'none';
+
+  // show/hide nav buttons based on permissions
+  document.querySelectorAll('.top-nav-btn').forEach(btn=>{
+    const onclick=btn.getAttribute('onclick')||'';
+    const match=onclick.match(/switchPage\('(\w+)'/);
+    if(!match)return;
+    const page=match[1];
+    if(page==='about'||page==='users'){btn.style.display='';return;}
+    if(isAdmin||isManager){btn.style.display='';return;}
+    // employee: show only allowed pages
+    btn.style.display=currentPerms.includes(page)?'':'none';
+  });
+}
+
+function canAccess(page){
+  if(currentRole==='admin'||currentRole==='manager') return true;
+  return currentPerms.includes(page);
+}
+
+// ── USERS MANAGEMENT ──
+document.getElementById('new-user-role')?.addEventListener('change',function(){
+  document.getElementById('new-user-permissions').style.display=this.value==='employee'?'block':'none';
+});
+
+function toggleEditPerms(){
+  const r=document.getElementById('edit-role').value;
+  document.getElementById('edit-permissions').style.display=r==='employee'?'block':'none';
+}
+
+window.createUser=async()=>{
+  const email=document.getElementById('new-user-email').value.trim();
+  const name=document.getElementById('new-user-name').value.trim();
+  const pass=document.getElementById('new-user-pass').value;
+  const role=document.getElementById('new-user-role').value;
+  const err=document.getElementById('new-user-err');
+  err.textContent='';
+  if(!email||!name||!pass){err.textContent='⚠️ ادخل كل البيانات';return;}
+  if(pass.length<6){err.textContent='⚠️ كلمة المرور 6 حروف على الأقل';return;}
+
+  const perms=[];
+  if(role==='employee'){
+    document.querySelectorAll('.perm-check:checked').forEach(cb=>perms.push(cb.dataset.perm));
+  }
+
+  try{
+    // create secondary auth (use REST API to avoid logging out current user)
+    const res=await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyB8Q-a3VMbl4ok9-kM5MVgPC7RvPN9czbw`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email,password:pass,displayName:name,returnSecureToken:true})
+    });
+    const data=await res.json();
+    if(data.error){err.textContent='⚠️ '+( data.error.message==='EMAIL_EXISTS'?'الإيميل ده موجود بالفعل':'حصل خطأ: '+data.error.message);return;}
+
+    const uid=data.localId;
+    // save role in admin's namespace (for listing) and user's own namespace
+    await setDoc(doc(db,'users',currentUser.uid,'team',uid),{uid,name,email,role,permissions:perms,createdAt:new Date().toISOString()});
+    await setDoc(doc(db,'users',uid,'settings','role'),{role,permissions:perms,name,email,uid,adminUid:currentUser.uid});
+
+    // clear form
+    ['new-user-email','new-user-name','new-user-pass'].forEach(id=>document.getElementById(id).value='');
+    document.querySelectorAll('.perm-check').forEach(cb=>cb.checked=false);
+    document.getElementById('new-user-permissions').style.display='none';
+    document.getElementById('new-user-role').value='manager';
+    showToast(`✅ تم إضافة ${name}`);
+    renderUsersList();
+  }catch(e){err.textContent='⚠️ حصل خطأ، حاول تاني';}
+};
+
+async function renderUsersList(){
+  const list=document.getElementById('users-list');
+  if(!list)return;
+  list.innerHTML='<div style="text-align:center;color:var(--muted);font-size:.8rem;padding:20px;">جاري التحميل...</div>';
+  try{
+    const snap=await getDocs(collection(db,'users',currentUser.uid,'team'));
+    if(snap.empty){list.innerHTML='<div class="empty"><div class="big">👥</div>ملفيش مستخدمين لسه</div>';return;}
+    list.innerHTML='';
+    snap.docs.forEach(d=>{
+      const u=d.data();
+      const roleLabel=u.role==='manager'?'👔 مدير':'👷 موظف';
+      const roleColor=u.role==='manager'?'var(--accent4)':'var(--accent2)';
+      const card=document.createElement('div');
+      card.style.cssText='background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:14px 16px;margin-bottom:10px;';
+      card.innerHTML=`
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--accent4),#1d4ed8);display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:900;color:#fff;flex-shrink:0;">${u.name?u.name[0]:'?'}</div>
+          <div style="flex:1;">
+            <div style="font-weight:700;font-size:.9rem;">${u.name}</div>
+            <div style="font-size:.7rem;color:var(--muted);margin-top:1px;">${u.email}</div>
+          </div>
+          <span style="font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:99px;border:1px solid ${roleColor};color:${roleColor};">${roleLabel}</span>
+        </div>
+        ${u.role==='employee'&&u.permissions?.length?`<div style="font-size:.7rem;color:var(--muted);margin-bottom:10px;">الأقسام: ${u.permissions.join(' · ')}</div>`:''}
+        <div style="display:flex;gap:8px;">
+          <button onclick="openPermsModal('${u.uid}','${u.name}','${u.role}',${JSON.stringify(u.permissions||[])})" style="flex:1;padding:8px;background:var(--card2);border:none;border-radius:10px;color:var(--text);font-family:Cairo,sans-serif;font-size:.76rem;font-weight:700;cursor:pointer;">✏️ تعديل الصلاحيات</button>
+          <button onclick="deleteUser('${u.uid}','${u.name}')" style="flex:1;padding:8px;background:rgba(239,68,68,.15);border:none;border-radius:10px;color:var(--accent3);font-family:Cairo,sans-serif;font-size:.76rem;font-weight:700;cursor:pointer;">🗑 حذف</button>
+        </div>`;
+      list.appendChild(card);
+    });
+
+    // show current user role info
+    const roleEl=document.getElementById('current-user-role');
+    if(roleEl) roleEl.innerHTML=`<div style="background:rgba(245,158,11,.1);border:1px solid var(--accent);border-radius:12px;padding:10px 14px;font-size:.8rem;"><span style="color:var(--accent);font-weight:700;">👑 أنت: Admin</span> — صلاحيات كاملة</div>`;
+  }catch(e){list.innerHTML='<div class="empty"><div class="big">⚠️</div>حصل خطأ في التحميل</div>';}
+}
+
+window.openPermsModal=(uid,name,role,perms)=>{
+  editingUserId=uid;
+  document.getElementById('perms-modal-title').textContent=`✏️ صلاحيات ${name}`;
+  document.getElementById('edit-role').value=role;
+  document.getElementById('edit-permissions').style.display=role==='employee'?'block':'none';
+  document.querySelectorAll('.edit-perm-check').forEach(cb=>{cb.checked=perms.includes(cb.dataset.perm);});
+  document.getElementById('perms-overlay').classList.add('show');
+};
+window.closePermsModal=()=>document.getElementById('perms-overlay').classList.remove('show');
+
+window.saveUserPerms=async()=>{
+  const role=document.getElementById('edit-role').value;
+  const perms=[];
+  if(role==='employee') document.querySelectorAll('.edit-perm-check:checked').forEach(cb=>perms.push(cb.dataset.perm));
+  try{
+    await updateDoc(doc(db,'users',currentUser.uid,'team',editingUserId),{role,permissions:perms});
+    await updateDoc(doc(db,'users',editingUserId,'settings','role'),{role,permissions:perms});
+    closePermsModal();showToast('✅ تم تحديث الصلاحيات');renderUsersList();
+  }catch(e){showToast('⚠️ حصل خطأ');}
+};
+
+window.deleteUser=async(uid,name)=>{
+  if(!confirm(`هتحذف ${name}؟ مش هيقدر يدخل التطبيق بعد كده`))return;
+  try{
+    await deleteDoc(doc(db,'users',currentUser.uid,'team',uid));
+    await updateDoc(doc(db,'users',uid,'settings','role'),{role:'blocked',permissions:[]});
+    showToast(`🗑 تم حذف ${name}`);renderUsersList();
+  }catch(e){showToast('⚠️ حصل خطأ');}
+};
+
 // ── SWITCH PAGE ──
 window.switchPage=(name,btn)=>{
+  // check permission
+  if(!canAccess(name)&&name!=='about'&&name!=='users'){showToast('⛔ مش عندك صلاحية لهذا القسم');return;}
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.top-nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
@@ -1263,7 +1488,16 @@ window.switchPage=(name,btn)=>{
   if(name==='washing')renderWashing();
   if(name==='octane'){loadOctaneAlerts();renderOctane();}
   if(name==='search'){document.getElementById('global-search').value='';document.getElementById('search-results').innerHTML='<div class="empty"><div class="big">🔍</div>ابدأ الكتابة للبحث</div>';}
+  if(name==='users')renderUsersList();
 };
+
+// block if role is blocked
+async function checkIfBlocked(){
+  if(currentRole==='blocked'){
+    await signOut(auth);
+    alert('⛔ تم إلغاء صلاحيتك. تواصل مع الأدمن.');
+  }
+}
 </script>
 </body>
 </html>
