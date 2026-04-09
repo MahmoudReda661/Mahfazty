@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#0f1923">
+<title>محفظتي — لوحة الإدارة</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0f1a;--card:#111827;--card2:#1a2436;--accent:#f59e0b;--accent2:#10b981;--accent3:#ef4444;--accent4:#3b82f6;--purple:#a78bfa;--text:#f1f5f9;--muted:#64748b;--border:#1e2d42;--radius:18px;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* PASSWORD GATE */
+#gate{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
+.gate-card{background:var(--card);border-radius:24px;border:1px solid var(--border);padding:28px 24px;width:100%;max-width:380px;text-align:center;}
+.gate-logo{font-size:3rem;margin-bottom:8px;}
+.gate-title{font-size:1.5rem;font-weight:900;color:var(--accent);margin-bottom:4px;}
+.gate-sub{font-size:.82rem;color:var(--muted);margin-bottom:24px;}
+.gate-input{width:100%;background:var(--card2);border:1.5px solid var(--border);border-radius:12px;color:var(--text);font-family:'Cairo',sans-serif;font-size:.9rem;padding:12px 14px;outline:none;margin-bottom:12px;text-align:center;letter-spacing:4px;}
+.gate-input:focus{border-color:var(--accent);}
+.gate-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),#d97706);border:none;border-radius:12px;color:#000;font-family:'Cairo',sans-serif;font-size:1rem;font-weight:900;cursor:pointer;}
+.gate-err{color:var(--accent3);font-size:.78rem;margin-top:8px;min-height:18px;}
+
+/* MAIN ADMIN */
+#admin-page{display:none;}
+.topbar{position:sticky;top:0;z-index:100;background:rgba(10,15,26,.95);backdrop-filter:blur(16px);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.topbar-title{font-size:1rem;font-weight:900;color:var(--accent);}
+.topbar-sub{font-size:.7rem;color:var(--muted);}
+.btn-back{background:var(--card2);color:var(--text);border:none;border-radius:10px;font-family:'Cairo',sans-serif;font-size:.75rem;font-weight:700;padding:6px 12px;cursor:pointer;text-decoration:none;display:inline-block;}
+.btn-logout-sm{background:rgba(239,68,68,.15);color:var(--accent3);border:none;border-radius:10px;font-family:'Cairo',sans-serif;font-size:.72rem;font-weight:700;padding:5px 10px;cursor:pointer;}
+
+main{padding:16px;max-width:480px;margin:auto;}
+
+.section-title{font-size:.78rem;font-weight:700;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin:20px 0 10px;}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+.stat-card{background:var(--card);border-radius:14px;border:1px solid var(--border);padding:12px;text-align:center;}
+.stat-val{font-size:1.4rem;font-weight:900;}
+.stat-lbl{font-size:.65rem;color:var(--muted);margin-top:2px;}
+.c-y{color:var(--accent);}
+.c-b{color:var(--accent4);}
+.c-g{color:var(--accent2);}
+
+/* ADD USER */
+.add-card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:16px;margin-bottom:14px;}
+.add-card-title{font-size:.75rem;color:var(--muted);font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:6px;}
+.field{margin-bottom:12px;}
+.field label{display:block;font-size:.76rem;color:var(--muted);font-weight:600;margin-bottom:5px;}
+.field input,.field select{width:100%;background:var(--card2);border:1.5px solid var(--border);border-radius:12px;color:var(--text);font-family:'Cairo',sans-serif;font-size:.88rem;padding:11px 13px;outline:none;}
+.field input:focus,.field select:focus{border-color:var(--accent);}
+.field select option{background:var(--card2);}
+.perms-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px;}
+.perm-label{display:flex;align-items:center;gap:7px;background:var(--card2);border-radius:10px;padding:9px 11px;cursor:pointer;font-size:.78rem;border:1.5px solid var(--border);transition:border-color .15s;}
+.perm-label input{width:15px;height:15px;accent-color:var(--accent);cursor:pointer;flex-shrink:0;}
+.btn-add{width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),#d97706);border:none;border-radius:12px;color:#000;font-family:'Cairo',sans-serif;font-size:.9rem;font-weight:900;cursor:pointer;margin-top:12px;}
+.err-msg{color:var(--accent3);font-size:.76rem;text-align:center;margin-top:7px;min-height:17px;}
+
+/* USER CARDS */
+.user-card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:14px 16px;margin-bottom:10px;animation:slideIn .25s ease;}
+@keyframes slideIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.user-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.user-av{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--accent4),#1d4ed8);display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:900;color:#fff;flex-shrink:0;}
+.user-info{flex:1;min-width:0;}
+.user-name{font-weight:700;font-size:.9rem;}
+.user-email{font-size:.68rem;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.role-badge{font-size:.65rem;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap;}
+.user-perms{font-size:.7rem;color:var(--muted);margin-bottom:10px;line-height:1.6;}
+.user-acts{display:flex;gap:7px;}
+.btn-edit-u{flex:1;padding:8px;background:var(--card2);border:none;border-radius:10px;color:var(--text);font-family:'Cairo',sans-serif;font-size:.74rem;font-weight:700;cursor:pointer;}
+.btn-del-u{flex:1;padding:8px;background:rgba(239,68,68,.15);border:none;border-radius:10px;color:var(--accent3);font-family:'Cairo',sans-serif;font-size:.74rem;font-weight:700;cursor:pointer;}
+
+/* EDIT MODAL */
+.overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.75);backdrop-filter:blur(5px);align-items:flex-end;justify-content:center;}
+.overlay.show{display:flex;}
+.modal{background:var(--card);border-radius:24px 24px 0 0;width:100%;max-width:480px;padding:22px 18px 38px;border-top:1px solid var(--border);animation:slideUp .3s ease;max-height:92vh;overflow-y:auto;position:relative;}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.modal-title{font-size:1rem;font-weight:900;margin-bottom:16px;text-align:center;}
+.modal-close{position:absolute;left:16px;top:16px;background:var(--card2);border:none;color:var(--muted);border-radius:50%;width:30px;height:30px;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.btn-save{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),#d97706);border:none;border-radius:var(--radius);color:#000;font-family:'Cairo',sans-serif;font-size:.92rem;font-weight:900;cursor:pointer;margin-top:12px;}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:9px 18px;font-size:.82rem;font-weight:600;opacity:0;transition:all .3s;z-index:999;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+.loading{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:14px;}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+
+<div class="loading" id="loading"><div style="font-size:2.5rem">⚙️</div><div class="spinner"></div></div>
+<div class="toast" id="toast"></div>
+
+<!-- PASSWORD GATE -->
+<div id="gate" style="display:none">
+  <div class="gate-card">
+    <div class="gate-logo">🔐</div>
+    <div class="gate-title">لوحة الإدارة</div>
+    <div class="gate-sub">ادخل باسورد الإدارة للمتابعة</div>
+    <input class="gate-input" type="password" id="gate-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')checkGate()">
+    <button class="gate-btn" onclick="checkGate()">🔓 دخول</button>
+    <div class="gate-err" id="gate-err"></div>
+    <div style="margin-top:16px;">
+      <a href="index.html" style="font-size:.78rem;color:var(--muted);text-decoration:none;">← رجوع للتطبيق</a>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN PAGE -->
+<div id="admin-page">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">⚙️ لوحة الإدارة</div>
+      <div class="topbar-sub" id="admin-email"></div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <a href="index.html" class="btn-back">← التطبيق</a>
+      <button class="btn-logout-sm" onclick="doLogout()">خروج</button>
+    </div>
+  </div>
+
+  <main>
+    <!-- STATS -->
+    <div class="section-title">نظرة عامة</div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-val c-y" id="st-users">0</div><div class="stat-lbl">مستخدم</div></div>
+      <div class="stat-card"><div class="stat-val c-b" id="st-managers">0</div><div class="stat-lbl">مدير</div></div>
+      <div class="stat-card"><div class="stat-val c-g" id="st-employees">0</div><div class="stat-lbl">موظف</div></div>
+    </div>
+
+    <!-- ADD USER -->
+    <div class="add-card">
+      <div class="add-card-title">➕ إضافة مستخدم جديد</div>
+      <div class="field"><label>الاسم</label><input type="text" id="nu-name" placeholder="اسم المستخدم"></div>
+      <div class="field"><label>الإيميل</label><input type="email" id="nu-email" placeholder="example@email.com"></div>
+      <div class="field"><label>كلمة المرور</label><input type="password" id="nu-pass" placeholder="6 حروف على الأقل"></div>
+      <div class="field">
+        <label>الدور</label>
+        <select id="nu-role" onchange="toggleNewPerms()">
+          <option value="manager">👔 مدير — يشوف كل حاجة</option>
+          <option value="employee">👷 موظف — أقسام محددة</option>
+        </select>
+      </div>
+      <div id="nu-perms-wrap" style="display:none;">
+        <div style="font-size:.74rem;color:var(--muted);font-weight:700;margin-top:12px;margin-bottom:8px;">الأقسام المسموح بيها:</div>
+        <div class="perms-grid" id="nu-perms-grid"></div>
+      </div>
+      <button class="btn-add" onclick="createUser()">➕ إضافة المستخدم</button>
+      <div class="err-msg" id="nu-err"></div>
+    </div>
+
+    <!-- USERS LIST -->
+    <div class="section-title">المستخدمين الحاليين</div>
+    <div id="users-list" style="margin-bottom:40px;"></div>
+  </main>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="overlay" id="edit-overlay" onclick="if(event.target===this)closeEditModal()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeEditModal()">✕</button>
+    <div class="modal-title" id="edit-modal-title">تعديل المستخدم</div>
+    <div class="field">
+      <label>الدور</label>
+      <select id="edit-role" onchange="toggleEditPerms()">
+        <option value="manager">👔 مدير</option>
+        <option value="employee">👷 موظف</option>
+      </select>
+    </div>
+    <div id="edit-perms-wrap" style="display:none;">
+      <div style="font-size:.74rem;color:var(--muted);font-weight:700;margin-top:12px;margin-bottom:8px;">الأقسام المسموح بيها:</div>
+      <div class="perms-grid" id="edit-perms-grid"></div>
+    </div>
+    <div class="field" style="margin-top:12px;"><label>كلمة مرور جديدة (اتركها فاضية لو مش عايز تغيرها)</label><input type="password" id="edit-pass" placeholder="اختياري"></div>
+    <button class="btn-save" onclick="saveEdit()">💾 حفظ التعديلات</button>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+import { getFirestore, collection, doc, setDoc, updateDoc, deleteDoc, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB8Q-a3VMbl4ok9-kM5MVgPC7RvPN9czbw",
+  authDomain: "ma7fazty-b023c.firebaseapp.com",
+  projectId: "ma7fazty-b023c",
+  storageBucket: "ma7fazty-b023c.firebasestorage.app",
+  messagingSenderId: "656857674800",
+  appId: "1:656857674800:web:15f0bf95bef8b8bbada9f5"
+};
+
+// ── ADMIN PASSWORD (change this!) ──
+const ADMIN_PASSWORD = 'Mahfazty@Admin2026';
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+let editingUid = null;
+let gateUnlocked = false;
+
+const PAGES = [
+  ['invoices','🧾','الفواتير'],
+  ['people','👥','الأشخاص'],
+  ['history','📅','الشهور'],
+  ['vehicles','🚗','العربيات'],
+  ['washing','🚿','الغسيل'],
+  ['octane','⛽','أوكتين'],
+  ['search','🔍','بحث'],
+  ['stats','📊','إحصائيات'],
+];
+
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function showLoading(v){document.getElementById('loading').style.display=v?'flex':'none';}
+
+// ── GATE ──
+window.checkGate=()=>{
+  const pass=document.getElementById('gate-pass').value;
+  if(pass===ADMIN_PASSWORD){
+    gateUnlocked=true;
+    document.getElementById('gate').style.display='none';
+    document.getElementById('admin-page').style.display='block';
+    loadAll();
+  } else {
+    document.getElementById('gate-err').textContent='⚠️ الباسورد غلط';
+    document.getElementById('gate-pass').value='';
+  }
+};
+
+// ── AUTH STATE ──
+onAuthStateChanged(auth, async user => {
+  showLoading(false);
+  if(user){
+    // verify it's admin
+    try{
+      const roleDoc = await getDoc(doc(db,'users',user.uid,'settings','role'));
+      if(roleDoc.exists() && roleDoc.data().role !== 'admin'){
+        await signOut(auth);
+        document.getElementById('gate').style.display='flex';
+        document.getElementById('gate-err').textContent='⚠️ مش عندك صلاحية الإدارة';
+        return;
+      }
+    }catch(e){}
+    currentUser = user;
+    document.getElementById('admin-email').textContent = user.email;
+    if(gateUnlocked){
+      document.getElementById('admin-page').style.display='block';
+      loadAll();
+    } else {
+      document.getElementById('gate').style.display='flex';
+    }
+  } else {
+    // need to login
+    document.getElementById('gate').style.display='flex';
+  }
+});
+
+// ── LOGIN via gate (admin must be logged in) ──
+// If not logged in, show login fields in gate
+// Actually gate just checks password then loads
+// Admin needs to be logged in via main app first
+// OR we add quick login here
+
+window.doLogout = async () => {
+  if(!confirm('هتخرج؟'))return;
+  await signOut(auth);
+  gateUnlocked=false;
+  document.getElementById('admin-page').style.display='none';
+  document.getElementById('gate').style.display='flex';
+  document.getElementById('gate-pass').value='';
+};
+
+// ── PERMISSIONS GRID ──
+function buildGrid(containerId, checkClass, selected=[]){
+  const grid = document.getElementById(containerId);
+  if(!grid)return;
+  grid.innerHTML='';
+  PAGES.forEach(([k,icon,label])=>{
+    const lbl = document.createElement('label');
+    lbl.className='perm-label';
+    if(selected.includes(k)) lbl.style.borderColor='var(--accent)';
+    lbl.innerHTML=`<input type="checkbox" class="${checkClass}" data-perm="${k}" ${selected.includes(k)?'checked':''}> ${icon} ${label}`;
+    lbl.querySelector('input').addEventListener('change',function(){
+      lbl.style.borderColor = this.checked?'var(--accent)':'var(--border)';
+    });
+    grid.appendChild(lbl);
+  });
+}
+
+window.toggleNewPerms=()=>{
+  const r = document.getElementById('nu-role').value;
+  const w = document.getElementById('nu-perms-wrap');
+  w.style.display = r==='employee'?'block':'none';
+  if(r==='employee') buildGrid('nu-perms-grid','nu-perm',[]);
+};
+window.toggleEditPerms=()=>{
+  const r = document.getElementById('edit-role').value;
+  document.getElementById('edit-perms-wrap').style.display = r==='employee'?'block':'none';
+};
+
+// ── LOAD ALL ──
+async function loadAll(){
+  if(!currentUser)return;
+  await renderUsers();
+}
+
+// ── RENDER USERS ──
+async function renderUsers(){
+  const list = document.getElementById('users-list');
+  list.innerHTML='<div style="text-align:center;color:var(--muted);padding:20px;font-size:.82rem;">جاري التحميل...</div>';
+  try{
+    const snap = await getDocs(collection(db,'users',currentUser.uid,'team'));
+    const users = snap.docs.map(d=>d.data());
+
+    // stats
+    document.getElementById('st-users').textContent = users.length;
+    document.getElementById('st-managers').textContent = users.filter(u=>u.role==='manager').length;
+    document.getElementById('st-employees').textContent = users.filter(u=>u.role==='employee').length;
+
+    if(!users.length){
+      list.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--muted)"><div style="font-size:2.5rem;margin-bottom:8px;">👥</div>ملفيش مستخدمين لسه</div>';
+      return;
+    }
+    list.innerHTML='';
+    users.forEach(u=>{
+      const roleLabel = u.role==='manager'?'👔 مدير':'👷 موظف';
+      const roleColor = u.role==='manager'?'var(--accent4)':'var(--accent2)';
+      const permNames = (u.permissions||[]).map(k=>{const p=PAGES.find(([pk])=>pk===k);return p?p[1]+p[2]:'';}).filter(Boolean).join(' · ');
+
+      const card = document.createElement('div');
+      card.className='user-card';
+      card.innerHTML=`
+        <div class="user-head">
+          <div class="user-av">${u.name?u.name[0].toUpperCase():'?'}</div>
+          <div class="user-info">
+            <div class="user-name">${u.name}</div>
+            <div class="user-email">${u.email}</div>
+          </div>
+          <span class="role-badge" style="border:1px solid ${roleColor};color:${roleColor};">${roleLabel}</span>
+        </div>
+        ${u.role==='employee'&&permNames?`<div class="user-perms">📌 ${permNames}</div>`:''}
+        <div class="user-acts">
+          <button class="btn-edit-u" onclick="openEdit('${u.uid}','${u.name}','${u.role}',${JSON.stringify(u.permissions||[])})">✏️ تعديل</button>
+          <button class="btn-del-u" onclick="deleteUser('${u.uid}','${u.name}')">🗑 حذف</button>
+        </div>`;
+      list.appendChild(card);
+    });
+  }catch(e){
+    list.innerHTML='<div style="text-align:center;padding:20px;color:var(--accent3);">⚠️ حصل خطأ في التحميل</div>';
+  }
+}
+
+// ── CREATE USER ──
+window.createUser = async () => {
+  const name  = document.getElementById('nu-name').value.trim();
+  const email = document.getElementById('nu-email').value.trim();
+  const pass  = document.getElementById('nu-pass').value;
+  const role  = document.getElementById('nu-role').value;
+  const err   = document.getElementById('nu-err');
+  err.textContent='';
+
+  if(!name||!email||!pass){err.textContent='⚠️ ادخل كل البيانات';return;}
+  if(pass.length<6){err.textContent='⚠️ كلمة المرور 6 حروف على الأقل';return;}
+
+  const perms=[];
+  if(role==='employee') document.querySelectorAll('.nu-perm:checked').forEach(cb=>perms.push(cb.dataset.perm));
+
+  try{
+    const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyB8Q-a3VMbl4ok9-kM5MVgPC7RvPN9czbw`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email,password:pass,displayName:name,returnSecureToken:true})
+    });
+    const data = await res.json();
+    if(data.error){
+      err.textContent='⚠️ '+(data.error.message==='EMAIL_EXISTS'?'الإيميل ده موجود':'حصل خطأ: '+data.error.message);
+      return;
+    }
+    const uid = data.localId;
+    await setDoc(doc(db,'users',currentUser.uid,'team',uid),{uid,name,email,role,permissions:perms,createdAt:new Date().toISOString()});
+    await setDoc(doc(db,'users',uid,'settings','role'),{role,permissions:perms,name,email,uid,adminUid:currentUser.uid});
+
+    ['nu-name','nu-email','nu-pass'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('nu-role').value='manager';
+    document.getElementById('nu-perms-wrap').style.display='none';
+    showToast(`✅ تم إضافة ${name}`);
+    renderUsers();
+  }catch(e){err.textContent='⚠️ حصل خطأ، حاول تاني';}
+};
+
+// ── EDIT USER ──
+window.openEdit = (uid,name,role,perms) => {
+  editingUid = uid;
+  document.getElementById('edit-modal-title').textContent = `✏️ ${name}`;
+  document.getElementById('edit-role').value = role;
+  document.getElementById('edit-perms-wrap').style.display = role==='employee'?'block':'none';
+  buildGrid('edit-perms-grid','edit-perm',perms);
+  document.getElementById('edit-pass').value='';
+  document.getElementById('edit-overlay').classList.add('show');
+};
+window.closeEditModal = () => document.getElementById('edit-overlay').classList.remove('show');
+
+window.saveEdit = async () => {
+  const role  = document.getElementById('edit-role').value;
+  const pass  = document.getElementById('edit-pass').value;
+  const perms = [];
+  if(role==='employee') document.querySelectorAll('.edit-perm:checked').forEach(cb=>perms.push(cb.dataset.perm));
+
+  try{
+    await updateDoc(doc(db,'users',currentUser.uid,'team',editingUid),{role,permissions:perms});
+    await updateDoc(doc(db,'users',editingUid,'settings','role'),{role,permissions:perms});
+
+    // update password if provided
+    if(pass.length>=6){
+      await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:update?key=AIzaSyB8Q-a3VMbl4ok9-kM5MVgPC7RvPN9czbw`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({idToken:await auth.currentUser.getIdToken(),password:pass,returnSecureToken:false})
+      });
+    }
+    closeEditModal();
+    showToast('✅ تم حفظ التعديلات');
+    renderUsers();
+  }catch(e){showToast('⚠️ حصل خطأ');}
+};
+
+// ── DELETE USER ──
+window.deleteUser = async (uid,name) => {
+  if(!confirm(`هتحذف ${name}؟\nمش هيقدر يدخل التطبيق بعد كده.`))return;
+  try{
+    await deleteDoc(doc(db,'users',currentUser.uid,'team',uid));
+    await updateDoc(doc(db,'users',uid,'settings','role'),{role:'blocked',permissions:[]});
+    showToast(`🗑 تم حذف ${name}`);
+    renderUsers();
+  }catch(e){showToast('⚠️ حصل خطأ');}
+};
+</script>
+</body>
+</html>

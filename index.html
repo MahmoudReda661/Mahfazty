@@ -231,20 +231,10 @@ main{padding:16px;max-width:480px;margin:auto;padding-bottom:30px;}
   <div class="login-title">محفظتي</div>
   <div class="login-sub">نظام إدارة الفواتير والعربيات</div>
   <div class="login-card">
-    <div class="login-tabs">
-      <button class="login-tab active" onclick="switchLoginTab('login',this)">دخول</button>
-      <button class="login-tab" onclick="switchLoginTab('register',this)">حساب جديد</button>
-    </div>
     <div id="login-form">
       <div class="lf"><label>الإيميل</label><input type="email" id="l-email" placeholder="example@email.com"></div>
       <div class="lf"><label>كلمة المرور</label><input type="password" id="l-pass" placeholder="••••••••"></div>
       <button class="btn-login" onclick="doLogin()">🔐 دخول</button>
-    </div>
-    <div id="register-form" style="display:none">
-      <div class="lf"><label>الاسم</label><input type="text" id="r-name" placeholder="اسمك"></div>
-      <div class="lf"><label>الإيميل</label><input type="email" id="r-email" placeholder="example@email.com"></div>
-      <div class="lf"><label>كلمة المرور</label><input type="password" id="r-pass" placeholder="6 حروف على الأقل"></div>
-      <button class="btn-login" onclick="doRegister()">✨ إنشاء حساب</button>
     </div>
     <div class="login-err" id="login-err"></div>
   </div>
@@ -641,14 +631,18 @@ const weekStart=()=>{const d=new Date();d.setDate(d.getDate()-d.getDay());return
 
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 function showLoading(v){document.getElementById('loading').style.display=v?'flex':'none';}
-const iCol=()=>collection(db,'users',currentUser.uid,'invoices');
-const vCol=()=>collection(db,'users',currentUser.uid,'vehicles');
-const oCol=()=>collection(db,'users',currentUser.uid,'octane');
-const wCol=()=>collection(db,'users',currentUser.uid,'washing');
-const iDoc=id=>doc(db,'users',currentUser.uid,'invoices',id);
-const vDoc=id=>doc(db,'users',currentUser.uid,'vehicles',id);
-const oDoc=id=>doc(db,'users',currentUser.uid,'octane',id);
-const wDoc=id=>doc(db,'users',currentUser.uid,'washing',id);
+
+// dataUid = admin's uid (employees read admin's data)
+let dataUid=null;
+const getDataUid=()=>dataUid||currentUser.uid;
+const iCol=()=>collection(db,'users',getDataUid(),'invoices');
+const vCol=()=>collection(db,'users',getDataUid(),'vehicles');
+const oCol=()=>collection(db,'users',getDataUid(),'octane');
+const wCol=()=>collection(db,'users',getDataUid(),'washing');
+const iDoc=id=>doc(db,'users',getDataUid(),'invoices',id);
+const vDoc=id=>doc(db,'users',getDataUid(),'vehicles',id);
+const oDoc=id=>doc(db,'users',getDataUid(),'octane',id);
+const wDoc=id=>doc(db,'users',getDataUid(),'washing',id);
 
 let currentRole='admin';
 let currentPerms=[];
@@ -659,24 +653,27 @@ onAuthStateChanged(auth,async user=>{
   showLoading(false);
   if(user){
     currentUser=user;
-    // load role
     try{
       const roleDoc=await getDoc(doc(db,'users',user.uid,'settings','role'));
       if(roleDoc.exists()){
-        currentRole=roleDoc.data().role||'admin';
-        currentPerms=roleDoc.data().permissions||[];
+        const data=roleDoc.data();
+        currentRole=data.role||'admin';
+        currentPerms=data.permissions||[];
+        // if employee/manager, use admin's uid for data
+        dataUid=data.adminUid||null;
+        if(currentRole==='blocked'){await signOut(auth);alert('⛔ تم إلغاء صلاحيتك.');return;}
       } else {
-        // first user = admin
         currentRole='admin';
+        dataUid=null;
         await setDoc(doc(db,'users',user.uid,'settings','role'),{role:'admin',permissions:[],name:user.displayName||'',email:user.email,uid:user.uid});
       }
-    }catch(e){currentRole='admin';}
+    }catch(e){currentRole='admin';dataUid=null;}
     applyPermissions();
     document.getElementById('login-page').style.display='none';
     document.getElementById('app-page').style.display='block';
     startListening();
   } else {
-    currentUser=null;
+    currentUser=null;dataUid=null;
     document.getElementById('login-page').style.display='flex';
     document.getElementById('app-page').style.display='none';
     unsubs.forEach(u=>u());unsubs=[];
@@ -1376,7 +1373,7 @@ function applyPermissions(){
   const rf=document.getElementById('register-form');
   if(rf) rf.style.display='none';
 
-  // show/hide users nav (admin only)
+  // show/hide users nav
   const navUsers=document.getElementById('nav-users');
   if(navUsers) navUsers.style.display=isAdmin?'':'none';
 
